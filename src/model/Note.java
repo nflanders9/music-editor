@@ -164,5 +164,25 @@ public final class Note {
     return Objects.hash(this.pitch, this.duration, this.duration, this.octave);
   }
 
+  /**
+   * Return a negative value if this Note is lower than the given Note, 0 if the
+   * two Notes are the same, and a positive value if this Note is higher than the
+   * given Note
+   * @param other the Note to compare against this Note
+   * @return  a negative value if this Note is lower than the given Note, 0 if the
+   * two Notes are the same, and a positive value if this Note is higher than the
+   * given Note
+   * @throws NullPointerException if the other Note is null
+   */
+  public int compareTo(Note other) {
+    Objects.requireNonNull(other);
+    if (this.octave <= other.octave) {
+      return this.pitch.compareTo(other.pitch);
+    }
+    else {
+      return this.octave - other.octave;
+    }
+  }
+
 
 }

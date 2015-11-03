@@ -49,4 +49,5 @@ public interface MusicEditorModel {
    *              this MusicEditorModel
    */
   public void overlay(MusicEditorModel song);
+
 }
