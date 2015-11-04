@@ -2,7 +2,6 @@ package model;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Objects;
 
 /**
  * Represents a song to be edited in a music editor
@@ -19,7 +18,7 @@ public final class Song implements MusicEditorModel {
   private int tempo;
 
   /**
-   * Represents the number of beats in
+   * Represents the number of beats in on measure
    */
   private int beatsPerMeasure;
 

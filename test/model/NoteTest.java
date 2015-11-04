@@ -213,6 +213,12 @@ public class NoteTest {
     assertEquals(this.cs7.getInstrumentID(), 3);
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  public void testIllegalSetInstrument() {
+    init();
+    this.c4.setInstrument(-1);
+  }
+
   // tests for equality and hash code methods
 
   @Test
