@@ -7,10 +7,36 @@ import java.util.List;
  */
 public interface MusicEditorModel {
   /**
-   * Adds a new note to this MusicEditorModel
+   * Adds a copy of the given note to this MusicEditorModel
    * @param note  the new Note to be added
    */
   public void addNote(Note note);
+
+  /**
+   * Sets the tempo of this MusicEditorModel to the given value
+   * @param tempo the tempo to be set
+   * @throws IllegalArgumentException if the tempo is not positive
+   */
+  public void setTempo(int tempo);
+
+  /**
+   * Gets the tempo of this MusicEditorModel
+   * @return  the tempo of this MusicEditorModel in beats per minute
+   */
+  public int getTempo();
+
+  /**
+   * Sets the number of beats in one measure in this MusicEditorModel
+   * @param   beatsPerMeasure
+   * @throws  IllegalArgumentException if the given beats per measure is not positive
+   */
+  public void setBeatsPerMeasure(int beatsPerMeasure);
+
+  /**
+   * Gets the number of beats in one measure of this MusicEditorModel
+   * @return  the number of beats in one measure
+   */
+  public int getBeatsPerMeasure();
 
   /**
    * Returns a list of all Notes in this MusicEditorModel
@@ -28,7 +54,7 @@ public interface MusicEditorModel {
 
   /**
    * Appends copies of the Notes in the given MusicEditorModel to the conclusion of
-   * this MusicEditorModel
+   * this MusicEditorModel. If the given MusicEditorModel is null, nothing is copied
    * @param song  the MusicEditorModel containing Notes that will be appended to the
    *              end of this MusicEditorModel maintaining their relative order and
    *              durations but changing all of their start durations by an amount
@@ -44,10 +70,16 @@ public interface MusicEditorModel {
   public int getLength();
 
   /**
-   * Copies the Notes from the given MusicEditorModel to this MusicEditorModel
+   * Copies the Notes from the given MusicEditorModel to this MusicEditorModel. If the
+   * given MusicEditorModel is null, nothing new is copied
    * @param song  the MusicEditorModel containing Notes that will be copied into
    *              this MusicEditorModel
    */
   public void overlay(MusicEditorModel song);
 
+  /**
+   * Return a String containing the textual representation of this MusicEditorModel
+   * @return the textual representation of this MusicEditorModel
+   */
+  public String textView();
 }

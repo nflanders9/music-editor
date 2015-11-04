@@ -34,7 +34,14 @@ public final class Note {
   private int octave;
 
   /**
-   * Constructs a Note
+   * Represents an ID for an instrument that is playing this Note
+   *
+   * Invariant: instrumentID cannot be less than 0
+   */
+  private int instrumentID;
+
+  /**
+   * Constructs a Note with the default instrumentID
    * @param startBeat the beat that the note starts on
    * @param duration  the number of beats that the note lasts
    * @param pitch     the pitch of the note
@@ -50,6 +57,24 @@ public final class Note {
     this.duration = duration;
     this.pitch = Objects.requireNonNull(pitch);
     this.octave = octave;
+    this.instrumentID = 0;
+  }
+
+  /**
+   * Constructs a Note with the specified instrumentID
+   * @param startBeat the beat that the note starts on
+   * @param duration  the number of beats that the note lasts
+   * @param pitch     the pitch of the note
+   * @throws IllegalArgumentException if the given startBeat, instrumentID,
+   * or duration values are invalid
+   * @throws NullPointerException if the given pitch is null
+   */
+  public Note(int startBeat, int duration, Pitch pitch, int octave, int instrumentID) {
+    this(startBeat, duration, pitch, octave);
+    if (instrumentID < 0) {
+      throw new IllegalArgumentException("Invalid instrument ID");
+    }
+    this.instrumentID = instrumentID;
   }
 
   /**
@@ -63,6 +88,7 @@ public final class Note {
     this.duration = other.duration;
     this.startBeat = other.startBeat;
     this.octave = other.octave;
+    this.instrumentID = other.instrumentID;
   }
 
   /**
@@ -95,6 +121,14 @@ public final class Note {
    */
   public int getOctave() {
     return octave;
+  }
+
+  /**
+   * Get the instrument ID of this Note
+   * @return the instrument ID of this Note
+   */
+  public int getInstrumentID() {
+    return this.instrumentID;
   }
 
   /**
@@ -146,6 +180,20 @@ public final class Note {
     return this;
   }
 
+  /**
+   * Sets this Note's instrument ID and returns a reference to this Note
+   * @param instrument  the new start beat of this Note
+   * @return            this Note
+   * @throws IllegalArgumentException if the given start beat is negative
+   */
+  public Note setInstrument(int instrument) {
+    if (instrument < 0) {
+      throw new IllegalArgumentException("Illegal instrument ID");
+    }
+    this.instrumentID = instrument;
+    return this;
+  }
+
 
   @Override
   public boolean equals(Object other) {
@@ -156,12 +204,14 @@ public final class Note {
     return this.pitch == otherNote.pitch &&
             this.startBeat == otherNote.startBeat &&
             this.duration == otherNote.duration &&
-            this.octave == otherNote.octave;
+            this.octave == otherNote.octave &&
+            this.instrumentID == otherNote.instrumentID;
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(this.pitch, this.duration, this.duration, this.octave);
+    return Objects.hash(this.pitch, this.duration,
+            this.duration, this.octave, this.instrumentID);
   }
 
   /**
@@ -176,12 +226,7 @@ public final class Note {
    */
   public int compareTo(Note other) {
     Objects.requireNonNull(other);
-    if (this.octave <= other.octave) {
-      return this.pitch.compareTo(other.pitch);
-    }
-    else {
-      return this.octave - other.octave;
-    }
+    return Pitch.distance(other.getPitch(), other.getOctave(), this.pitch, this.octave);
   }
 
 

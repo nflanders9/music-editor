@@ -7,7 +7,7 @@ import java.util.Objects;
 import static org.junit.Assert.*;
 
 /**
- * Tests for methods on the Note class
+ * Tests for methods on the Note class and the Pitch enum
  */
 public class NoteTest {
 
@@ -22,9 +22,9 @@ public class NoteTest {
    * Initializes all local Notes for testing
    */
   private void init() {
-    this.c4 = new Note(0, 1, Pitch.C, 4);
-    this.cs7 = new Note(9, 4, Pitch.Cs, 7);
-    this.a12 = new Note(13, 5, Pitch.A, 12);
+    this.c4 = new Note(0, 1, Pitch.C, 4, 0);
+    this.cs7 = new Note(9, 4, Pitch.Cs, 7, 3);
+    this.a12 = new Note(13, 5, Pitch.A, 12, 1);
     this.fs0 = new Note(153, 7, Pitch.Fs, 0);
     this.gNeg2 = new Note(2, 2, Pitch.G, -2);
   }
@@ -48,6 +48,11 @@ public class NoteTest {
   @Test(expected = IllegalArgumentException.class)
   public void testNegativeDurationBeatPitch() {
     new Note(2, -1, Pitch.C, 5);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testNegativeInstrumentID() {
+    new Note(1, 1, Pitch.C, 4, -1);
   }
 
   // tests the copy constructor
@@ -108,6 +113,16 @@ public class NoteTest {
     assertEquals(this.cs7.getOctave(), 7);
     assertEquals(this.fs0.getOctave(), 0);
     assertEquals(this.gNeg2.getOctave(), -2);
+  }
+
+  @Test
+  public void testGetInstrument() {
+    init();
+    assertEquals(this.a12.getInstrumentID(), 1);
+    assertEquals(this.c4.getInstrumentID(), 0);
+    assertEquals(this.cs7.getInstrumentID(), 3);
+    assertEquals(this.fs0.getInstrumentID(), 0);
+    assertEquals(this.gNeg2.getInstrumentID(), 0);
   }
 
 
@@ -186,6 +201,18 @@ public class NoteTest {
     assertEquals(this.fs0.getOctave(), 0);
   }
 
+  @Test
+  public void testSetInstrument() {
+    init();
+    this.c4.setInstrument(5);
+    assertEquals(this.c4.getInstrumentID(), 5);
+    this.c4.setInstrument(0);
+    assertEquals(this.c4.getInstrumentID(), 0);
+
+    this.cs7.setInstrument(3);
+    assertEquals(this.cs7.getInstrumentID(), 3);
+  }
+
   // tests for equality and hash code methods
 
   @Test
@@ -198,6 +225,7 @@ public class NoteTest {
     assert(!this.c4.equals(new Note(0, 1, Pitch.Cs, 4)));
     assert(!this.c4.equals(new Note(1, 1, Pitch.C, 5)));
     assert(!this.c4.equals(new Note(11, 13, Pitch.Cs, 5)));
+    assert(!this.c4.equals(new Note(11, 13, Pitch.Cs, 5, 6)));
   }
 
   @Test
@@ -205,5 +233,31 @@ public class NoteTest {
     init();
     Note newNote = new Note(this.c4);
     assert(newNote.equals(this.c4) && newNote.hashCode() == this.c4.hashCode());
+  }
+
+  @Test
+  public void testCompareTo() {
+    init();
+    assertEquals(this.c4.compareTo(this.c4), 0);
+    assertEquals(this.c4.compareTo(this.a12), -105);
+    assertEquals(this.a12.compareTo(this.c4), 105);
+    assertEquals(this.gNeg2.compareTo(this.cs7), -102);
+  }
+
+  @Test
+  public void testPitchToString() {
+    assertEquals(Pitch.A.toString(), "A");
+    assertEquals(Pitch.C.toString(), "C");
+    assertEquals(Pitch.Cs.toString(), "C#");
+    assertEquals(Pitch.Gs.toString(), "G#");
+  }
+
+  @Test
+  public void testPitchDistance() {
+    assertEquals(Pitch.distance(Pitch.C, 4, Pitch.C, 4), 0);
+    assertEquals(Pitch.distance(Pitch.C, 4, Pitch.C, 5), 12);
+    assertEquals(Pitch.distance(Pitch.B, 4, Pitch.C, 4), -11);
+    assertEquals(Pitch.distance(Pitch.B, 3, Pitch.C, 4), 1);
+    assertEquals(Pitch.distance(Pitch.As, 4, Pitch.A, 7), 35);
   }
 }

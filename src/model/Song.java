@@ -2,6 +2,7 @@ package model;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  * Represents a song to be edited in a music editor
@@ -13,24 +14,69 @@ public final class Song implements MusicEditorModel {
   private ArrayList<Note> notes;
 
   /**
-   * Construct an empty Song
+   * Represents the tempo of this song in beats per minute
+   */
+  private int tempo;
+
+  /**
+   * Represents the number of beats in
+   */
+  private int beatsPerMeasure;
+
+  /**
+   * Construct an empty Song with a default tempo of 120 bpm
    */
   public Song() {
     this.notes = new ArrayList<Note>();
+    this.tempo = 120;
+    this.beatsPerMeasure = 4;
   }
 
   /**
    * Construct a Song based on the notes in the given List of Notes
    * @param notes the list containing the Notes to be added to this Song
+   * @throws IllegalArgumentException if the tempo or beatsPerMeasure are not positive
    */
-  public Song(List<Note> notes) {
+  public Song(List<Note> notes, int tempo, int beatsPerMeasure) {
+    if (tempo <= 0 || beatsPerMeasure <= 0) {
+      throw new IllegalArgumentException("Invalid song construction arguments");
+    }
     this.notes = new ArrayList<Note>();
     this.notes.addAll(notes);
+    this.tempo = tempo;
+    this.beatsPerMeasure = beatsPerMeasure;
   }
 
   @Override
   public void addNote(Note note) {
-    this.notes.add(note);
+    this.notes.add(new Note(note));
+  }
+
+
+  @Override
+  public int getTempo() {
+    return this.tempo;
+  }
+
+  @Override
+  public void setTempo(int tempo) {
+    if (tempo <= 0) {
+      throw new IllegalArgumentException("Tempo must be positive");
+    }
+    this.tempo = tempo;
+  }
+
+  @Override
+  public int getBeatsPerMeasure() {
+    return this.beatsPerMeasure;
+  }
+
+  @Override
+  public void setBeatsPerMeasure(int beatsPerMeasure) {
+    if (beatsPerMeasure <= 0) {
+      throw new IllegalArgumentException("Invalid number of beats per measure");
+    }
+    this.beatsPerMeasure = beatsPerMeasure;
   }
 
   @Override
@@ -45,12 +91,16 @@ public final class Song implements MusicEditorModel {
 
   @Override
   public void append(MusicEditorModel song) {
+    if (song == null) {
+      return;
+    }
     ArrayList<Note> newNotes = new ArrayList<Note>();
     for (Note note : song.getNotes()) {
       Note newNote = new Note(note);
       newNote.setStart(newNote.getStartBeat() + this.getLength());
       newNotes.add(newNote);
     }
+    this.notes.addAll(newNotes);
   }
 
   @Override
@@ -64,10 +114,18 @@ public final class Song implements MusicEditorModel {
 
   @Override
   public void overlay(MusicEditorModel song) {
+    if (song == null) {
+      return;
+    }
     ArrayList<Note> newNotes = new ArrayList<Note>();
     for (Note note : song.getNotes()) {
       this.notes.add(new Note(note));
     }
+  }
+
+  @Override
+  public String textView() {
+    return this.toString();
   }
 
   @Override
@@ -96,8 +154,8 @@ public final class Song implements MusicEditorModel {
     Pitch highestPitch = highest.getPitch();
 
     // computes the width of the console needed to display the notes in this song
-    int width = Pitch.values().length * (highestOctave - lowestOctave) +
-            (highestPitch.ordinal() - lowestPitch.ordinal()) + 1;
+    int width = Math.abs(Pitch.distance(lowestPitch, lowestOctave,
+            highestPitch, highestOctave)) + 1;
 
     // initialize a List of Arrays containing the characters to print for each line
     List<String[]> output = new ArrayList<String[]>();
