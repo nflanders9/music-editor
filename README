@@ -1,0 +1,37 @@
+Music Editor Model README
+Nicholas Flanders
+
+
+My model for a music editor revolves around the MusicEditorModel interface,
+the public final class Note, and the public enum Pitch. There is also a Song
+class which implements MusicEditorModel.
+
+The Pitch enumeration contains the names of all of the musical pitches without
+an octave associated with them. There are some static and non-static methods
+in this enum that make manipulations on the Pitches more convenient.
+
+The Note class is public so that clients that use the MusicEditorModel can
+create notes and add them to a musical score. The class is final to prevent
+any subclasses from overriding Note as implementations of MusicEditorModel
+may depend on the implementation of Note. Notes contain a start beat, a
+duration, a Pitch, an octave, and an instrument ID. All of these fields may
+affect the sound of the music or the visual display when rendered with a view.
+
+The MusicEditorModel is the interface that shows the public side of the model
+of songs for a music editor. This interface has methods that return all of the
+notes in the song, add new notes to the song, remove notes from the song, display
+the songs as text, and see and alter the tempo and the time signature of the song.
+Is also has methods that overlay one MusicEditorModel on top of another or append
+it to the end of the current MusicEditorModel. It is important to note that all
+of the note additions are handled via a copy constructor on the Note class to
+prevent the aliasing of a Note in one MusicEditorModel to a Note of another. This
+is important because when a Note is added to a musical score from another, any
+modifications to the newly added not should not affect the original note in the source.
+
+The final class Song implements the MusicEditorModel in my representation. This class
+serves as the concrete implementation of a MusicEditorModel where methods are
+actually implemented. Song has an overridden toString method that is used by its
+implementation of textView in order to produce a textual representation of the
+data contained within the Song. All of the fields within Song are private and
+therefore must be accessed with the public getters and setters on the
+MusicEditorModel interface.
