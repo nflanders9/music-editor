@@ -1,6 +1,5 @@
 package model;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -59,17 +58,21 @@ public class MusicEditorModelTest {
   @Test
   public void testAddNote() {
     init();
-    assertEquals(m0.getNotes().size(), 0);
+    assertEquals(m0.getNotes(0).size(), 0);
     m0.addNote(n0);
-    assertEquals(m0.getNotes().size(), 1);
-    assertEquals(m0.getNotes().get(0), n0);
+    assertEquals(m0.getNotes(0).size(), 1);
+    assertEquals(m0.getNotes(1).size(), 1);
+    assertEquals(m0.getNotes(2).size(), 1);
+    assertEquals(m0.getNotes(3).size(), 1);
+    assertEquals(m0.getNotes(4).size(), 0);
+    assertEquals(m0.getNotes(0).get(0), n0);
 
-    assertEquals(m3.getNotes().size(), 5);
+    assertEquals(m3.getNotes(1).size(), 1);
     m3.addNote(n1);
-    assertEquals(m3.getNotes().size(), 6);
+    assertEquals(m3.getNotes(1).size(), 2);
     //check that the node is copied and not aliased
-    assertEquals(m3.getNotes().get(0), m3.getNotes().get(5));
-    assert(!(m3.getNotes().get(0) == m3.getNotes().get(5)));
+    assertEquals(m3.getNotes(1).get(1), n1);
+    assert(!(m3.getNotes(1).get(1) == n1));
 
   }
 
@@ -105,13 +108,18 @@ public class MusicEditorModelTest {
   @Test
   public void testGetNotes() {
     init();
-    assertEquals(m0.getNotes().size(), 0);
-    assertEquals(m3.getNotes().get(0), n1);
-    assertEquals(m3.getNotes().get(1), n2);
-    assertEquals(m3.getNotes().get(2), n3);
-    assertEquals(m3.getNotes().get(3), n4);
-    assertEquals(m3.getNotes().get(4), n5);
-    assertEquals(m3.getNotes().size(), 5);
+    assertEquals(m0.getNotes(0).size(), 0);
+    assert(m3.getNotes(1).contains(n1));
+    assert(m3.getNotes(5).contains(n4));
+    assert(m3.getNotes(6).containsAll(Arrays.asList(n3, n4, n5)));
+    assert(m3.getNotes(15).contains(n3));
+    assert(m3.getNotes(99).size() == 0);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testIllegalGetNotes() {
+    init();
+    m0.getNotes(-1);
   }
 
   @Test
@@ -146,33 +154,44 @@ public class MusicEditorModelTest {
   public void testRemoveNote() {
     init();
     assertEquals(m0.removeNote(n0), false);
-    assertEquals(m3.getNotes().size(), 5);
-    assert(m3.getNotes().contains(n1));
+    assert(m3.getNotes(1).contains(n1));
+    assert(m3.getNotes(2).contains(n1));
+    assert(m3.getNotes(3).contains(n1));
     assertEquals(m3.removeNote(n1), true);
-    assertEquals(m3.getNotes().size(), 4);
-    assert(!m3.getNotes().contains(n1));
+    assert(!m3.getNotes(1).contains(n1));
+    assert(!m3.getNotes(2).contains(n1));
+    assert(!m3.getNotes(3).contains(n1));
+
+    assert(!m3.getNotes(0).contains(n1));
     assertEquals(m3.removeNote(n0), false);
-    assertEquals(m3.getNotes().size(), 4);
   }
 
   @Test
   public void testAppend() {
     init();
     m0.append(m0);
-    assertEquals(m0.getNotes().size(), 0);
+    assertEquals(m0.getNotes(0).size(), 0);
+
+    assertEquals(m3.getLength(), 22);
     m3.append(m3);
-    assertEquals(m3.getNotes().size(), 10);
+    assertEquals(m3.getLength(), 44);
+
     // ensure that only the note's start beat was changed
-    assertNotEquals(m3.getNotes().get(0), m3.getNotes().get(5));
-    m3.getNotes().get(0).setStart(m3.getNotes().get(5).getStartBeat());
-    assertEquals(m3.getNotes().get(0), m3.getNotes().get(5));
+    assertNotEquals(m3.getNotes(1).get(0), m3.getNotes(23).get(0));
+    m3.getNotes(1).get(0).setStart(m3.getNotes(23).get(0).getStartBeat());
+    assertEquals(m3.getNotes(1).get(0), m3.getNotes(23).get(0));
 
-    assertEquals(m2.getNotes().size(), 4);
+    assertEquals(m2.getNotes(5).size(), 0);
+    m2.append(m3);
+    assertEquals(m2.getNotes(5).size(), 0);
+
+    assertEquals(m2.getNotes(28).size(), 3);
+
+    assertEquals(m2.getLength(), 66);
     m2.append(m0);
-    assertEquals(m2.getNotes().size(), 4);
-
+    assertEquals(m2.getLength(), 66);
     m2.append(null);
-    assertEquals(m2.getNotes().size(), 4);
+    assertEquals(m2.getLength(), 66);
   }
 
   @Test
@@ -189,24 +208,24 @@ public class MusicEditorModelTest {
   @Test
   public void testOverlay() {
     init();
-    assertEquals(m0.getNotes().size(), 0);
+    assertEquals(m0.getNotes(0).size(), 0);
     m0.overlay(m0);
-    assertEquals(m0.getNotes().size(), 0);
+    assertEquals(m0.getNotes(0).size(), 0);
 
     m0.overlay(m3);
-    assertEquals(m0.getNotes().size(), 5);
+    assertEquals(m0.getNotes(8), Arrays.asList(n2, n3, n5));
+    assertEquals(m0.getLength(), 22);
     m0.overlay(m3);
-    assertEquals(m0.getNotes().size(), 10);
-    // the first and fifth notes should be identical
-    assertEquals(m0.getNotes().get(0), m0.getNotes().get(5));
+    assertEquals(m0.getNotes(8), Arrays.asList(n2, n3, n5, n2, n3, n5));
+    assertEquals(m0.getLength(), 22);
 
     m3.overlay(m2);
-    assertEquals(m3.getNotes(), Arrays.asList(n1, n2, n3, n4, n5, n0, n1, n2, n3));
+    assertEquals(m3.getNotes(3), Arrays.asList(n1, n0, n1));
     m3.overlay(null);
-    assertEquals(m3.getNotes(), Arrays.asList(n1, n2, n3, n4, n5, n0, n1, n2, n3));
+    assertEquals(m3.getNotes(3), Arrays.asList(n1, n0, n1));
     // ensure that copies of the notes were made instead of aliasing
-    assertEquals(m3.getNotes().get(5), m2.getNotes().get(0));
-    assert(!(m3.getNotes().get(5) == m2.getNotes().get(0)));
+    assertEquals(m3.getNotes(3).get(1), m2.getNotes(3).get(0));
+    assert(!(m3.getNotes(3).get(1) == m2.getNotes(3).get(0)));
   }
 
   @Test

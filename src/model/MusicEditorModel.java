@@ -39,16 +39,18 @@ public interface MusicEditorModel {
   public int getBeatsPerMeasure();
 
   /**
-   * Returns a list of all Notes in this MusicEditorModel
+   * Returns a list of all Notes in this MusicEditorModel that are playing at the given beat number
    * @return  List of all Notes in this MusicEditorModel
+   * @throws IllegalArgumentException if the given beat number is negative
    */
-  public List<Note> getNotes();
+  public List<Note> getNotes(int beatNum);
 
   /**
    * Removes the note that is exactly the given Note from this MusicEditorModel
    * @param note  the Note to be removed
    * @return boolean indicating whether the given Note was successfully found and
    * removed from this MusicEditorModel
+   * @throws NullPointerException if the given Note is null
    */
   public boolean removeNote(Note note);
 

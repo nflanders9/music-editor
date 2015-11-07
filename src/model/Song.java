@@ -2,15 +2,18 @@ package model;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Objects;
+import java.util.TreeMap;
 
 /**
  * Represents a song to be edited in a music editor
  */
 public final class Song implements MusicEditorModel {
   /**
-   * Represents the list of Notes that comprise this Song
+   * Represents the Notes the comprise this song as a map where the beat number is the key and
+   * the values are the lists of Notes that are either beginning or sustaining during that beat
    */
-  private ArrayList<Note> notes;
+  private TreeMap<Integer, List<Note>> notes;
 
   /**
    * Represents the tempo of this song in beats per minute
@@ -26,7 +29,7 @@ public final class Song implements MusicEditorModel {
    * Construct an empty Song with a default tempo of 120 bpm
    */
   public Song() {
-    this.notes = new ArrayList<Note>();
+    this.notes = new TreeMap<Integer, List<Note>>();
     this.tempo = 120;
     this.beatsPerMeasure = 4;
   }
@@ -40,15 +43,36 @@ public final class Song implements MusicEditorModel {
     if (tempo <= 0 || beatsPerMeasure <= 0) {
       throw new IllegalArgumentException("Invalid song construction arguments");
     }
-    this.notes = new ArrayList<Note>();
-    this.notes.addAll(notes);
+    this.notes = new TreeMap<Integer, List<Note>>();
+    for (Note note : notes) {
+      this.addNote(note);
+    }
     this.tempo = tempo;
     this.beatsPerMeasure = beatsPerMeasure;
   }
 
   @Override
   public void addNote(Note note) {
-    this.notes.add(new Note(note));
+    int endBeat = note.getStartBeat() + note.getDuration();
+    for (int beat = note.getStartBeat(); beat < endBeat; ++ beat) {
+      this.ensureInit(beat);
+      this.notes.get(beat).add(new Note(note));
+    }
+  }
+
+  /**
+   * Checks that the notes map containing this Song's notes at the given beat is
+   * already initialized and if not, it initializes it to a new empty list of notes
+   * @param beatNum the number of the beat to ensure exists in this Song
+   * @throws IllegalArgumentException if the given beat number is negative
+   */
+  private void ensureInit(int beatNum) {
+    if (beatNum < 0) {
+      throw new IllegalArgumentException("Illegal beat number");
+    }
+    if (!this.notes.containsKey(beatNum)) {
+      this.notes.put(beatNum, new ArrayList<Note>());
+    }
   }
 
 
@@ -79,13 +103,25 @@ public final class Song implements MusicEditorModel {
   }
 
   @Override
-  public List<Note> getNotes() {
-    return this.notes;
+  public List<Note> getNotes(int beatNum) {
+    if (beatNum < 0) {
+      throw new IllegalArgumentException("Illegal beat number");
+    }
+    this.ensureInit(beatNum);
+    return this.notes.get(beatNum);
   }
+
 
   @Override
   public boolean removeNote(Note note) {
-    return this.notes.remove(note);
+    Objects.requireNonNull(note);
+    boolean success = true;
+    int endBeat = note.getStartBeat() + note.getDuration();
+    for (int beat = note.getStartBeat(); beat < endBeat; ++ beat) {
+      this.ensureInit(beat);
+      success &= this.notes.get(beat).remove(note);
+    }
+    return success;
   }
 
   @Override
@@ -93,22 +129,33 @@ public final class Song implements MusicEditorModel {
     if (song == null) {
       return;
     }
-    ArrayList<Note> newNotes = new ArrayList<Note>();
-    for (Note note : song.getNotes()) {
-      Note newNote = new Note(note);
-      newNote.setStart(newNote.getStartBeat() + this.getLength());
-      newNotes.add(newNote);
+    int offset = this.getLength();
+    int otherLength = song.getLength();
+    for (int beat = 0; beat < otherLength; ++ beat) {
+      for (Note note : song.getNotes(beat)) {
+        this.ensureInit(beat + offset);
+        Note newNote = new Note(note);
+        newNote.setStart(newNote.getStartBeat() + offset);
+        this.notes.get(beat + offset).add(newNote);
+      }
     }
-    this.notes.addAll(newNotes);
   }
 
   @Override
   public int getLength() {
-    int maxBeat = 0;
-    for (Note note : this.notes) {
-      maxBeat = Math.max(maxBeat, note.getStartBeat() + note.getDuration());
+    // ensure that any lists of notes at the end of the piece are not included in the
+    // length if they are empty lists
+    if (this.notes.size() == 0) {
+      return 0;
     }
-    return maxBeat;
+    int lastBeat = this.notes.lastKey();
+    while (this.notes.get(lastBeat).size() == 0) {
+      -- lastBeat;
+      if (lastBeat <= 0) {
+        return 0;
+      }
+    }
+    return lastBeat + 1;
   }
 
   @Override
@@ -116,9 +163,12 @@ public final class Song implements MusicEditorModel {
     if (song == null) {
       return;
     }
-    ArrayList<Note> newNotes = new ArrayList<Note>();
-    for (Note note : song.getNotes()) {
-      this.notes.add(new Note(note));
+    int length = Math.max(this.getLength(), song.getLength());
+    for (int beat = 0; beat < length; ++ beat) {
+      for (Note note : song.getNotes(beat)) {
+        this.ensureInit(beat);
+        this.notes.get(beat).add(new Note(note));
+      }
     }
   }
 
@@ -135,14 +185,16 @@ public final class Song implements MusicEditorModel {
     }
 
     // find the highest and lowest notes in this Song
-    Note lowest = this.notes.get(0);
-    Note highest = lowest;
-    for (Note note : this.notes) {
-      if (note.compareTo(lowest) < 0) {
-        lowest = note;
-      }
-      else if (note.compareTo(highest) > 0) {
-        highest = note;
+    Note lowest = null;
+    Note highest = null;
+    for (List<Note> row : this.notes.values()) {
+      for (Note note : row) {
+        if (lowest == null || note.compareTo(lowest) < 0) {
+          lowest = note;
+        }
+        else if (highest == null || note.compareTo(highest) > 0) {
+          highest = note;
+        }
       }
     }
 
@@ -164,20 +216,22 @@ public final class Song implements MusicEditorModel {
 
 
     // mark each of the arrays where a Note is with either a "X" or a "|"
-    for (Note note : this.notes) {
-      int startBeat = note.getStartBeat();
-      int endBeat = startBeat + note.getDuration();
+    for (List<Note> row : this.notes.values()) {
+      for (Note note : row) {
+        int startBeat = note.getStartBeat();
+        int endBeat = startBeat + note.getDuration();
 
-      // finds the column to print the symbol in
-      int noteIndex = Pitch.values().length * (note.getOctave() - lowestOctave) +
-              (note.getPitch().ordinal() - lowestPitch.ordinal());
+        // finds the column to print the symbol in
+        int noteIndex = Pitch.values().length * (note.getOctave() - lowestOctave) +
+                (note.getPitch().ordinal() - lowestPitch.ordinal());
 
-      // iterate through every beat that the note sustains for and add the appropriate symbol
-      for (int beat = startBeat; beat < endBeat; beat++) {
-        String symbol = (beat == startBeat) ? "X" : "|";
-        // only overwrite the symbol that is currently there if it is not an "X"
-        if (output.get(beat)[noteIndex] != "X") {
-          output.get(beat)[noteIndex] = symbol;
+        // iterate through every beat that the note sustains for and add the appropriate symbol
+        for (int beat = startBeat; beat < endBeat; beat++) {
+          String symbol = (beat == startBeat) ? "X" : "|";
+          // only overwrite the symbol that is currently there if it is not an "X"
+          if (output.get(beat)[noteIndex] != "X") {
+            output.get(beat)[noteIndex] = symbol;
+          }
         }
       }
     }
