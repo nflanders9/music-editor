@@ -181,6 +181,21 @@ public final class Song implements MusicEditorModel {
   }
 
   @Override
+  public Playable getExtreme(boolean highest) {
+    Playable output = null;
+    for (int beat = 0; beat < this.getLength(); ++ beat) {
+      for (Playable note : this.getNotes(beat)) {
+        // updates the output if the current note is on the appropriate side of
+        // the current output based whether we're looking for the highest or lowest
+        if (output == null || (highest == (note.compareTo(output) >= 0))) {
+          output = note;
+        }
+      }
+    }
+    return output;
+  }
+
+  @Override
   public String textView() {
     return this.toString();
   }

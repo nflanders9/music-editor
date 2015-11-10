@@ -81,6 +81,14 @@ public interface MusicEditorModel {
   public void overlay(MusicEditorModel song);
 
   /**
+   * Returns the Playable that is the highest in the song if highest is true or the lowest
+   * in the song otherwise
+   * @param highest boolean selector between highest and lowest values
+   * @return  Playable instance on one extreme of this song, or null if the song is empty
+   */
+  public Playable getExtreme(boolean highest);
+
+  /**
    * Return a String containing the textual representation of this MusicEditorModel
    * @return the textual representation of this MusicEditorModel
    */

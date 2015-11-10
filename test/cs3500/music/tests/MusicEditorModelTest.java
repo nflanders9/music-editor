@@ -235,6 +235,17 @@ public class MusicEditorModelTest {
   }
 
   @Test
+  public void testGetExtreme() {
+    init();
+    assertEquals(m0.getExtreme(true), null);
+    assertEquals(m0.getExtreme(false), null);
+    assertEquals(m2.getExtreme(true), n1);
+    assertEquals(m2.getExtreme(false), n3);
+    assertEquals(m3.getExtreme(true), n5);
+    assertEquals(m3.getExtreme(false), n3);
+  }
+
+  @Test
   public void testTextView() {
     init();
     assertEquals(m0.textView(), "");
