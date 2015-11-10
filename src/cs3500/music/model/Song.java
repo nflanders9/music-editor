@@ -1,4 +1,4 @@
-package model;
+package cs3500.music.model;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -10,10 +10,10 @@ import java.util.TreeMap;
  */
 public final class Song implements MusicEditorModel {
   /**
-   * Represents the Notes the comprise this song as a map where the beat number is the key and
-   * the values are the lists of Notes that are either beginning or sustaining during that beat
+   * Represents the Playables the comprise this song as a map where the beat number is the key and
+   * the values are the lists of Playables that are either beginning or sustaining during that beat
    */
-  private TreeMap<Integer, List<Note>> notes;
+  private TreeMap<Integer, List<Playable>> notes;
 
   /**
    * Represents the tempo of this song in beats per minute
@@ -29,22 +29,22 @@ public final class Song implements MusicEditorModel {
    * Construct an empty Song with a default tempo of 120 bpm
    */
   public Song() {
-    this.notes = new TreeMap<Integer, List<Note>>();
+    this.notes = new TreeMap<Integer, List<Playable>>();
     this.tempo = 120;
     this.beatsPerMeasure = 4;
   }
 
   /**
-   * Construct a Song based on the notes in the given List of Notes
+   * Construct a Song based on the notes in the given List of Playables
    * @param notes the list containing the Notes to be added to this Song
    * @throws IllegalArgumentException if the tempo or beatsPerMeasure are not positive
    */
-  public Song(List<Note> notes, int tempo, int beatsPerMeasure) {
+  public Song(List<Playable> notes, int tempo, int beatsPerMeasure) {
     if (tempo <= 0 || beatsPerMeasure <= 0) {
       throw new IllegalArgumentException("Invalid song construction arguments");
     }
-    this.notes = new TreeMap<Integer, List<Note>>();
-    for (Note note : notes) {
+    this.notes = new TreeMap<Integer, List<Playable>>();
+    for (Playable note : notes) {
       this.addNote(note);
     }
     this.tempo = tempo;
@@ -52,17 +52,18 @@ public final class Song implements MusicEditorModel {
   }
 
   @Override
-  public void addNote(Note note) {
+  public void addNote(Playable note) {
     int endBeat = note.getStartBeat() + note.getDuration();
+    Playable copy = note.copy();
     for (int beat = note.getStartBeat(); beat < endBeat; ++ beat) {
       this.ensureInit(beat);
-      this.notes.get(beat).add(new Note(note));
+      this.notes.get(beat).add(copy);
     }
   }
 
   /**
    * Checks that the notes map containing this Song's notes at the given beat is
-   * already initialized and if not, it initializes it to a new empty list of notes
+   * already initialized and if not, it initializes it to a new empty list of Playables
    * @param beatNum the number of the beat to ensure exists in this Song
    * @throws IllegalArgumentException if the given beat number is negative
    */
@@ -71,7 +72,7 @@ public final class Song implements MusicEditorModel {
       throw new IllegalArgumentException("Illegal beat number");
     }
     if (!this.notes.containsKey(beatNum)) {
-      this.notes.put(beatNum, new ArrayList<Note>());
+      this.notes.put(beatNum, new ArrayList<Playable>());
     }
   }
 
@@ -103,7 +104,7 @@ public final class Song implements MusicEditorModel {
   }
 
   @Override
-  public List<Note> getNotes(int beatNum) {
+  public List<Playable> getNotes(int beatNum) {
     if (beatNum < 0) {
       throw new IllegalArgumentException("Illegal beat number");
     }
@@ -113,13 +114,13 @@ public final class Song implements MusicEditorModel {
 
 
   @Override
-  public boolean removeNote(Note note) {
-    Objects.requireNonNull(note);
+  public boolean removeNote(Playable playable) {
+    Objects.requireNonNull(playable);
     boolean success = true;
-    int endBeat = note.getStartBeat() + note.getDuration();
-    for (int beat = note.getStartBeat(); beat < endBeat; ++ beat) {
+    int endBeat = playable.getStartBeat() + playable.getDuration();
+    for (int beat = playable.getStartBeat(); beat < endBeat; ++ beat) {
       this.ensureInit(beat);
-      success &= this.notes.get(beat).remove(note);
+      success &= this.notes.get(beat).remove(playable);
     }
     return success;
   }
@@ -132,11 +133,14 @@ public final class Song implements MusicEditorModel {
     int offset = this.getLength();
     int otherLength = song.getLength();
     for (int beat = 0; beat < otherLength; ++ beat) {
-      for (Note note : song.getNotes(beat)) {
-        this.ensureInit(beat + offset);
-        Note newNote = new Note(note);
-        newNote.setStart(newNote.getStartBeat() + offset);
-        this.notes.get(beat + offset).add(newNote);
+      for (Playable note : song.getNotes(beat)) {
+        // make sure to only copy notes that start at a given beat
+        if (note.getStartBeat() == beat) {
+          this.ensureInit(beat + offset);
+          Playable newPlayable = note.copy();
+          newPlayable.setStart(newPlayable.getStartBeat() + offset);
+          this.addNote(newPlayable);
+        }
       }
     }
   }
@@ -165,9 +169,13 @@ public final class Song implements MusicEditorModel {
     }
     int length = Math.max(this.getLength(), song.getLength());
     for (int beat = 0; beat < length; ++ beat) {
-      for (Note note : song.getNotes(beat)) {
-        this.ensureInit(beat);
-        this.notes.get(beat).add(new Note(note));
+      for (Playable note : song.getNotes(beat)) {
+        // make sure to only copy notes that start at a given beat
+        if (note.getStartBeat() == beat) {
+          Playable newPlayable = note.copy();
+          this.ensureInit(beat);
+          this.addNote(newPlayable);
+        }
       }
     }
   }
@@ -185,15 +193,15 @@ public final class Song implements MusicEditorModel {
     }
 
     // find the highest and lowest notes in this Song
-    Note lowest = null;
-    Note highest = null;
-    for (List<Note> row : this.notes.values()) {
-      for (Note note : row) {
-        if (lowest == null || note.compareTo(lowest) < 0) {
-          lowest = note;
+    Playable lowest = null;
+    Playable highest = null;
+    for (List<Playable> row : this.notes.values()) {
+      for (Playable playable : row) {
+        if (lowest == null || playable.compareTo(lowest) < 0) {
+          lowest = playable;
         }
-        else if (highest == null || note.compareTo(highest) > 0) {
-          highest = note;
+        else if (highest == null || playable.compareTo(highest) > 0) {
+          highest = playable;
         }
       }
     }
@@ -216,14 +224,14 @@ public final class Song implements MusicEditorModel {
 
 
     // mark each of the arrays where a Note is with either a "X" or a "|"
-    for (List<Note> row : this.notes.values()) {
-      for (Note note : row) {
-        int startBeat = note.getStartBeat();
-        int endBeat = startBeat + note.getDuration();
+    for (List<Playable> row : this.notes.values()) {
+      for (Playable playable : row) {
+        int startBeat = playable.getStartBeat();
+        int endBeat = startBeat + playable.getDuration();
 
         // finds the column to print the symbol in
-        int noteIndex = Pitch.values().length * (note.getOctave() - lowestOctave) +
-                (note.getPitch().ordinal() - lowestPitch.ordinal());
+        int noteIndex = Pitch.values().length * (playable.getOctave() - lowestOctave) +
+                (playable.getPitch().ordinal() - lowestPitch.ordinal());
 
         // iterate through every beat that the note sustains for and add the appropriate symbol
         for (int beat = startBeat; beat < endBeat; beat++) {

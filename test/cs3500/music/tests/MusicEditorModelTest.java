@@ -1,9 +1,15 @@
-package model;
+package cs3500.music.tests;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.junit.Test;
+
+import cs3500.music.model.MusicEditorModel;
+import cs3500.music.model.Note;
+import cs3500.music.model.Pitch;
+import cs3500.music.model.Playable;
+import cs3500.music.model.Song;
 
 import static org.junit.Assert.*;
 
@@ -17,12 +23,12 @@ public class MusicEditorModelTest {
   MusicEditorModel m2;
   MusicEditorModel m3;
 
-  Note n0;
-  Note n1;
-  Note n2;
-  Note n3;
-  Note n4;
-  Note n5;
+  Playable n0;
+  Playable n1;
+  Playable n2;
+  Playable n3;
+  Playable n4;
+  Playable n5;
 
   /**
    * Initialize all MusicEditorModels in this test class with
@@ -37,7 +43,7 @@ public class MusicEditorModelTest {
     n5 = new Note(6, 7, Pitch.B, 5, 0);
 
     m0 = new Song();
-    m1 = new Song(new ArrayList<Note>(), 150, 4);
+    m1 = new Song(new ArrayList<Playable>(), 150, 4);
     m2 = new Song(Arrays.asList(n0, n1, n2, n3), 120, 2);
     m3 = new Song(Arrays.asList(n1, n2, n3, n4, n5), 120, 3);
   }
@@ -46,12 +52,12 @@ public class MusicEditorModelTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testIllegalTempo() {
-    new Song(new ArrayList<Note>(), 0, 3);
+    new Song(new ArrayList<Playable>(), 0, 3);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void testIllegalBeatsPerMeasure() {
-    new Song(new ArrayList<Note>(), 120, -1);
+    new Song(new ArrayList<Playable>(), 120, -1);
   }
 
 
@@ -213,16 +219,16 @@ public class MusicEditorModelTest {
     assertEquals(m0.getNotes(0).size(), 0);
 
     m0.overlay(m3);
-    assertEquals(m0.getNotes(8), Arrays.asList(n2, n3, n5));
+    assert(m0.getNotes(8).containsAll(Arrays.asList(n3, n5, n2)));
     assertEquals(m0.getLength(), 22);
     m0.overlay(m3);
-    assertEquals(m0.getNotes(8), Arrays.asList(n2, n3, n5, n2, n3, n5));
+    assert(m0.getNotes(8).containsAll(Arrays.asList(n2, n3, n5, n2, n3, n5)));
     assertEquals(m0.getLength(), 22);
 
     m3.overlay(m2);
-    assertEquals(m3.getNotes(3), Arrays.asList(n1, n0, n1));
+    assert(m3.getNotes(3).containsAll(Arrays.asList(n1, n0, n1)));
     m3.overlay(null);
-    assertEquals(m3.getNotes(3), Arrays.asList(n1, n0, n1));
+    assert(m3.getNotes(3).containsAll(Arrays.asList(n1, n0, n1)));
     // ensure that copies of the notes were made instead of aliasing
     assertEquals(m3.getNotes(3).get(1), m2.getNotes(3).get(0));
     assert(!(m3.getNotes(3).get(1) == m2.getNotes(3).get(0)));

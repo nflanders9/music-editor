@@ -1,4 +1,4 @@
-package model;
+package cs3500.music.model;
 
 /**
  * Represents the twelve musical pitches

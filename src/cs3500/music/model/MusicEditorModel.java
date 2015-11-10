@@ -1,4 +1,4 @@
-package model;
+package cs3500.music.model;
 
 import java.util.List;
 
@@ -7,10 +7,10 @@ import java.util.List;
  */
 public interface MusicEditorModel {
   /**
-   * Adds a copy of the given note to this MusicEditorModel
-   * @param note  the new Note to be added
+   * Adds a copy of the given Playable to this MusicEditorModel
+   * @param note  the new Playable to be added
    */
-  public void addNote(Note note);
+  public void addNote(Playable note);
 
   /**
    * Sets the tempo of this MusicEditorModel to the given value
@@ -39,25 +39,26 @@ public interface MusicEditorModel {
   public int getBeatsPerMeasure();
 
   /**
-   * Returns a list of all Notes in this MusicEditorModel that are playing at the given beat number
-   * @return  List of all Notes in this MusicEditorModel
+   * Returns a list of all Playables in this MusicEditorModel that are playing at the
+   * given beat number
+   * @return  List of all Playables in this MusicEditorModel
    * @throws IllegalArgumentException if the given beat number is negative
    */
-  public List<Note> getNotes(int beatNum);
+  public List<Playable> getNotes(int beatNum);
 
   /**
-   * Removes the note that is exactly the given Note from this MusicEditorModel
-   * @param note  the Note to be removed
-   * @return boolean indicating whether the given Note was successfully found and
+   * Removes the Playable that is exactly the given Playable from this MusicEditorModel
+   * @param note  the Playable to be removed
+   * @return boolean indicating whether the given Playable was successfully found and
    * removed from this MusicEditorModel
-   * @throws NullPointerException if the given Note is null
+   * @throws NullPointerException if the given Playable is null
    */
-  public boolean removeNote(Note note);
+  public boolean removeNote(Playable note);
 
   /**
-   * Appends copies of the Notes in the given MusicEditorModel to the conclusion of
+   * Appends copies of the Playables in the given MusicEditorModel to the conclusion of
    * this MusicEditorModel. If the given MusicEditorModel is null, nothing is copied
-   * @param song  the MusicEditorModel containing Notes that will be appended to the
+   * @param song  the MusicEditorModel containing Playables that will be appended to the
    *              end of this MusicEditorModel maintaining their relative order and
    *              durations but changing all of their start durations by an amount
    *              equal to the length of this MusicEditorModel
@@ -66,15 +67,15 @@ public interface MusicEditorModel {
 
   /**
    * Returns the length of this MusicEditorModel as a number of beats until the last
-   * Note in this MusicEditorModel stops sounding
+   * Playable in this MusicEditorModel stops sounding
    * @return  the length of this MusicEditorModel
    */
   public int getLength();
 
   /**
-   * Copies the Notes from the given MusicEditorModel to this MusicEditorModel. If the
+   * Copies the Playables from the given MusicEditorModel to this MusicEditorModel. If the
    * given MusicEditorModel is null, nothing new is copied
-   * @param song  the MusicEditorModel containing Notes that will be copied into
+   * @param song  the MusicEditorModel containing Playables that will be copied into
    *              this MusicEditorModel
    */
   public void overlay(MusicEditorModel song);

@@ -1,8 +1,10 @@
-package model;
+package cs3500.music.tests;
 
 import org.junit.Test;
 
-import java.util.Objects;
+import cs3500.music.model.Note;
+import cs3500.music.model.Pitch;
+import cs3500.music.model.Playable;
 
 import static org.junit.Assert.*;
 
@@ -12,10 +14,10 @@ import static org.junit.Assert.*;
 public class NoteTest {
 
   Note c4;
-  Note cs7;
+  Playable cs7;
   Note a12;
-  Note fs0;
-  Note gNeg2;
+  Playable fs0;
+  Playable gNeg2;
 
 
   /**
@@ -60,12 +62,12 @@ public class NoteTest {
   public void testCopyConstructor() {
     init();
 
-    Note new1 = new Note(this.a12);
+    Playable new1 = new Note(this.a12);
     assertEquals(new1, this.a12);
     this.a12.setStart(99);
     assertNotEquals(new1, this.a12);
 
-    Note new2 = new Note(this.c4);
+    Playable new2 = new Note(this.c4);
     assertEquals(new2, this.c4);
     this.c4.setPitch(Pitch.As);
     assertNotEquals(new2, this.c4);
@@ -224,8 +226,8 @@ public class NoteTest {
   @Test
   public void testEquals() {
     init();
-    Note newNote = new Note(0, 1, Pitch.C, 4);
-    assert(this.c4.equals(newNote) && !(newNote == this.c4));
+    Playable newPlayable = new Note(0, 1, Pitch.C, 4);
+    assert(this.c4.equals(newPlayable) && !(newPlayable == this.c4));
     assert(!this.c4.equals(new Note(1, 1, Pitch.C, 4)));
     assert(!this.c4.equals(new Note(0, 2, Pitch.C, 4)));
     assert(!this.c4.equals(new Note(0, 1, Pitch.Cs, 4)));
@@ -237,8 +239,8 @@ public class NoteTest {
   @Test
   public void testHashCode() {
     init();
-    Note newNote = new Note(this.c4);
-    assert(newNote.equals(this.c4) && newNote.hashCode() == this.c4.hashCode());
+    Playable newPlayable = new Note(this.c4);
+    assert(newPlayable.equals(this.c4) && newPlayable.hashCode() == this.c4.hashCode());
   }
 
   @Test
