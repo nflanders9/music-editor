@@ -85,9 +85,33 @@ public class MainGUI extends Application implements View {
     if (model.getLength() == 0) {
       return;
     }
-  gc.clearRect(0, 0, JavaFXConstants.WINDOW_WIDTH, JavaFXConstants.WINDOW_HEIGHT);
+
+    gc.setFill(Color.LIGHTGREY);
+    gc.fillRect(0, 0, JavaFXConstants.WINDOW_WIDTH, JavaFXConstants.WINDOW_HEIGHT);
+
     Objects.requireNonNull(gc);
     double beat = model.getTempo() * seconds / 60.0;
+
+    // determine the fraction of a measure that this time corresponds to
+    double measureFracOffset = 0;
+    int minMeasure = 0;
+    double minBeat = 0;
+    boolean scrolling = false;
+    if ((beat / (double) model.getBeatsPerMeasure()) > JavaFXConstants.MAX_BAR_LOCATION) {
+      measureFracOffset = (beat / model.getBeatsPerMeasure()) % 1.0;
+      minMeasure = (int) beat / model.getBeatsPerMeasure() - (int) JavaFXConstants.MAX_BAR_LOCATION;
+      minBeat = (beat / (double) model.getBeatsPerMeasure() - JavaFXConstants.MAX_BAR_LOCATION)
+              * model.getBeatsPerMeasure();
+      //minBeat = beat * (double) model.getBeatsPerMeasure() / (double) model.getBeatsPerMeasure() - ;
+      scrolling = true;
+    }
+    System.out.println(minBeat);
+    // determines position of beat tracking bar
+    double xPos = Math.min((double) JavaFXConstants.GRID_PADDING_LEFT +
+                    beat * ((double) JavaFXConstants.MEASURE_WIDTH / (double) model.getBeatsPerMeasure()),
+            JavaFXConstants.MEASURE_WIDTH * JavaFXConstants.MAX_BAR_LOCATION + JavaFXConstants.GRID_PADDING_LEFT);
+
+
     // find the highest and lowest notes in this Song
     Playable lowest = model.getLowest();
     Playable highest = model.getHighest();
@@ -127,7 +151,7 @@ public class MainGUI extends Application implements View {
     }
 
     // draw notes
-    for (int curBeat = 0;
+    for (int curBeat = (int) minBeat;
          curBeat < (int) beat + model.getBeatsPerMeasure() * JavaFXConstants.MAX_MEASURES_ON_SCREEN;
          curBeat++) {
       List<Playable> notes = model.getNotes(curBeat);
@@ -139,7 +163,7 @@ public class MainGUI extends Application implements View {
           gc.setFill(JavaFXConstants.NOTE_SUSTAIN_COLOR);
         }
         int pitchNum = Pitch.distance(lowestPitch, lowestOctave, note.getPitch(), note.getOctave());
-        gc.fillRect(curBeat * JavaFXConstants.MEASURE_WIDTH / model.getBeatsPerMeasure()
+        gc.fillRect((curBeat - minBeat) * JavaFXConstants.MEASURE_WIDTH / model.getBeatsPerMeasure()
                         + JavaFXConstants.GRID_PADDING_LEFT,
                 JavaFXConstants.GRID_PADDING_TOP + JavaFXConstants.GRID_SPACING_VERT * pitchNum,
                 (JavaFXConstants.MEASURE_WIDTH / model.getBeatsPerMeasure()),
@@ -149,22 +173,28 @@ public class MainGUI extends Application implements View {
 
     // draw vertical measure lines
     gc.setFill(Color.BLACK);
-    for (int measure = 0; measure <= JavaFXConstants.MAX_MEASURES_ON_SCREEN; measure++) {
-      gc.strokeLine(JavaFXConstants.GRID_PADDING_LEFT + JavaFXConstants.MEASURE_WIDTH * measure,
-              JavaFXConstants.GRID_PADDING_TOP,
-              JavaFXConstants.GRID_PADDING_LEFT + JavaFXConstants.MEASURE_WIDTH * measure,
-              JavaFXConstants.GRID_SPACING_VERT * (width + 2));
-      gc.fillText(Integer.toString(measure * 4),
-              JavaFXConstants.GRID_PADDING_LEFT + JavaFXConstants.MEASURE_WIDTH * measure,
-              JavaFXConstants.MEASURE_LABEL_PADDING);
+    for (int measure = minMeasure; measure <= minMeasure + JavaFXConstants.MAX_MEASURES_ON_SCREEN; measure++) {
+      double linePos = JavaFXConstants.GRID_PADDING_LEFT + JavaFXConstants.MEASURE_WIDTH * (measure - minMeasure - measureFracOffset);
+      if (linePos >= JavaFXConstants.GRID_PADDING_LEFT) {
+        gc.strokeLine(linePos,
+                JavaFXConstants.GRID_PADDING_TOP,
+                linePos,
+                JavaFXConstants.GRID_SPACING_VERT * (width + 2));
+        gc.fillText(Integer.toString(measure * 4),
+                linePos,
+                JavaFXConstants.MEASURE_LABEL_PADDING);
+      }
     }
+    gc.strokeLine(JavaFXConstants.GRID_PADDING_LEFT, JavaFXConstants.GRID_PADDING_TOP,
+            JavaFXConstants.GRID_PADDING_LEFT, JavaFXConstants.GRID_SPACING_VERT * (width + 2));
 
     // draw current beat line
     gc.setStroke(Color.RED);
     gc.setLineWidth(4);
-    double xPos = (double) JavaFXConstants.GRID_PADDING_LEFT + beat * ((double) JavaFXConstants.MEASURE_WIDTH / (double) model.getBeatsPerMeasure());
     gc.strokeLine(xPos, JavaFXConstants.GRID_PADDING_TOP, xPos,
             JavaFXConstants.GRID_PADDING_TOP + width * JavaFXConstants.GRID_SPACING_VERT);
+    //gc.strokeLine(JavaFXConstants.GRID_PADDING_LEFT, JavaFXConstants.GRID_PADDING_TOP, JavaFXConstants.GRID_PADDING_LEFT,
+    //        JavaFXConstants.GRID_PADDING_TOP + width * JavaFXConstants.GRID_SPACING_VERT);
 
   }
 
@@ -194,9 +224,9 @@ public class MainGUI extends Application implements View {
     if (classModel == null) {
       classModel = new Song();
       classModel.addNote(new Note(8, 4, Pitch.E, 4));
-      classModel.addNote(new Note(0, 8, Pitch.G, 4));
+      classModel.addNote(new Note(16, 8, Pitch.G, 4));
       classModel.addNote(new Note(2, 4, Pitch.D, 5));
-      classModel.addNote(new Note(4, 2, Pitch.Gs, 4));
+      classModel.addNote(new Note(12, 2, Pitch.Gs, 4));
       classModel.addNote(new Note(2, 4, Pitch.B, 3));
     }
     this.model = classModel;
@@ -212,8 +242,8 @@ public class MainGUI extends Application implements View {
     MainGUI parent = this;
     new AnimationTimer() {
       public void handle(long currentNanoTime) {
-        double elapsed = (currentNanoTime - startNanoTime) / 1000000000.0;
-        parent.render(gc, elapsed);
+        double elapsed = (currentNanoTime - startNanoTime) / 1000000000.0; // in seconds
+        parent.render(gc, elapsed * 2);
       }
     }.start();
 

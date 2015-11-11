@@ -22,10 +22,16 @@ final class JavaFXConstants {
   static final int MEASURE_WIDTH = 60;
   static final int MAX_MEASURES_ON_SCREEN = WINDOW_WIDTH / MEASURE_WIDTH + 1;
   static final int MEASURE_LABEL_PADDING = 30;
+
+  // represents the maximum number of measures to move the playing bar from the left side
+  // of the screen before moving the notes underneath the bar instead
+  static final double MAX_BAR_LOCATION = 4;
+
   static final LinearGradient NOTE_START_COLOR =
           new LinearGradient(0, JavaFXConstants.GRID_PADDING_TOP,
           0, JavaFXConstants.GRID_PADDING_TOP + (JavaFXConstants.GRID_SPACING_VERT / 2),
           false, CycleMethod.REFLECT, new Stop(0, Color.BLACK), new Stop(1, Color.DARKGRAY));
+
   static final LinearGradient NOTE_SUSTAIN_COLOR =
           new LinearGradient(0, JavaFXConstants.GRID_PADDING_TOP,
                   0, JavaFXConstants.GRID_PADDING_TOP + (JavaFXConstants.GRID_SPACING_VERT / 2),
