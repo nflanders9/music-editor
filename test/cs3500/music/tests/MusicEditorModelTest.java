@@ -5,11 +5,14 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
+import cs3500.music.consoleUI.View;
+import cs3500.music.javafxUI.MainGUI;
 import cs3500.music.model.MusicEditorModel;
 import cs3500.music.model.Note;
 import cs3500.music.model.Pitch;
 import cs3500.music.model.Playable;
 import cs3500.music.model.Song;
+import javafx.application.Application;
 
 import static org.junit.Assert.*;
 
@@ -31,8 +34,7 @@ public class MusicEditorModelTest {
   Playable n5;
 
   /**
-   * Initialize all MusicEditorModels in this test class with
-   * appropriate testing data
+   * Initialize all MusicEditorModels in this test class with appropriate testing data
    */
   private void init() {
     n0 = new Note(0, 4, Pitch.C, 4);
@@ -78,7 +80,7 @@ public class MusicEditorModelTest {
     assertEquals(m3.getNotes(1).size(), 2);
     //check that the node is copied and not aliased
     assertEquals(m3.getNotes(1).get(1), n1);
-    assert(!(m3.getNotes(1).get(1) == n1));
+    assert (!(m3.getNotes(1).get(1) == n1));
 
   }
 
@@ -115,11 +117,11 @@ public class MusicEditorModelTest {
   public void testGetNotes() {
     init();
     assertEquals(m0.getNotes(0).size(), 0);
-    assert(m3.getNotes(1).contains(n1));
-    assert(m3.getNotes(5).contains(n4));
-    assert(m3.getNotes(6).containsAll(Arrays.asList(n3, n4, n5)));
-    assert(m3.getNotes(15).contains(n3));
-    assert(m3.getNotes(99).size() == 0);
+    assert (m3.getNotes(1).contains(n1));
+    assert (m3.getNotes(5).contains(n4));
+    assert (m3.getNotes(6).containsAll(Arrays.asList(n3, n4, n5)));
+    assert (m3.getNotes(15).contains(n3));
+    assert (m3.getNotes(99).size() == 0);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -160,15 +162,15 @@ public class MusicEditorModelTest {
   public void testRemoveNote() {
     init();
     assertEquals(m0.removeNote(n0), false);
-    assert(m3.getNotes(1).contains(n1));
-    assert(m3.getNotes(2).contains(n1));
-    assert(m3.getNotes(3).contains(n1));
+    assert (m3.getNotes(1).contains(n1));
+    assert (m3.getNotes(2).contains(n1));
+    assert (m3.getNotes(3).contains(n1));
     assertEquals(m3.removeNote(n1), true);
-    assert(!m3.getNotes(1).contains(n1));
-    assert(!m3.getNotes(2).contains(n1));
-    assert(!m3.getNotes(3).contains(n1));
+    assert (!m3.getNotes(1).contains(n1));
+    assert (!m3.getNotes(2).contains(n1));
+    assert (!m3.getNotes(3).contains(n1));
 
-    assert(!m3.getNotes(0).contains(n1));
+    assert (!m3.getNotes(0).contains(n1));
     assertEquals(m3.removeNote(n0), false);
   }
 
@@ -219,51 +221,43 @@ public class MusicEditorModelTest {
     assertEquals(m0.getNotes(0).size(), 0);
 
     m0.overlay(m3);
-    assert(m0.getNotes(8).containsAll(Arrays.asList(n3, n5, n2)));
+    assert (m0.getNotes(8).containsAll(Arrays.asList(n3, n5, n2)));
     assertEquals(m0.getLength(), 22);
     m0.overlay(m3);
-    assert(m0.getNotes(8).containsAll(Arrays.asList(n2, n3, n5, n2, n3, n5)));
+    assert (m0.getNotes(8).containsAll(Arrays.asList(n2, n3, n5, n2, n3, n5)));
     assertEquals(m0.getLength(), 22);
 
     m3.overlay(m2);
-    assert(m3.getNotes(3).containsAll(Arrays.asList(n1, n0, n1)));
+    assert (m3.getNotes(3).containsAll(Arrays.asList(n1, n0, n1)));
     m3.overlay(null);
-    assert(m3.getNotes(3).containsAll(Arrays.asList(n1, n0, n1)));
+    assert (m3.getNotes(3).containsAll(Arrays.asList(n1, n0, n1)));
     // ensure that copies of the notes were made instead of aliasing
     assertEquals(m3.getNotes(3).get(1), m2.getNotes(3).get(0));
-    assert(!(m3.getNotes(3).get(1) == m2.getNotes(3).get(0)));
+    assert (!(m3.getNotes(3).get(1) == m2.getNotes(3).get(0)));
   }
 
   @Test
   public void testGetExtreme() {
     init();
-    assertEquals(m0.getExtreme(true), null);
-    assertEquals(m0.getExtreme(false), null);
-    assertEquals(m2.getExtreme(true), n1);
-    assertEquals(m2.getExtreme(false), n3);
-    assertEquals(m3.getExtreme(true), n5);
-    assertEquals(m3.getExtreme(false), n3);
+    assertEquals(m0.getHighest(), null);
+    assertEquals(m0.getLowest(), null);
+    assertEquals(m2.getHighest(), n1);
+    assertEquals(m2.getLowest(), n3);
+    assertEquals(m3.getHighest(), n5);
+    assertEquals(m3.getLowest(), n3);
   }
 
+
   @Test
-  public void testTextView() {
+  public void testConsoleView() {
     init();
-    assertEquals(m0.textView(), "");
     m0.addNote(new Note(0, 4, Pitch.C, 4));
     m0.addNote(new Note(0, 4, Pitch.E, 4));
     m0.addNote(new Note(0, 4, Pitch.G, 4));
     m0.addNote(new Note(2, 4, Pitch.D, 4));
     m0.addNote(new Note(4, 2, Pitch.Gs, 4));
     m0.addNote(new Note(2, 4, Pitch.B, 4));
-    assertEquals(m0.textView(),
-            "Beat   C4  C#4   D4  D#4   E4   F4  F#4   G4  G#4   A4  A#4   B4 \n" +
-                    "   0   X                   X              X                      \n" +
-                    "   1   |                   |              |                      \n" +
-                    "   2   |         X         |              |                   X  \n" +
-                    "   3   |         |         |              |                   |  \n" +
-                    "   4             |                             X              |  \n" +
-                    "   5             |                             |              |  \n" +
-                    "   6                                                             \n");
-
+    View view = new MainGUI(m0);
+    view.render();
   }
 }

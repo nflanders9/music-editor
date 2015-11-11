@@ -1,4 +1,4 @@
-package cs3500.music.view;
+package cs3500.music.consoleUI;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +9,7 @@ import cs3500.music.model.Pitch;
 import cs3500.music.model.Playable;
 
 /**
- * Represents a view for a music editor that displays information in a static
+ * Represents a javafxUI for a music editor that displays information in a static
  * vertical text representation
  */
 public class ConsoleView implements View {
@@ -32,26 +32,16 @@ public class ConsoleView implements View {
    * Return a string representation of the contents of this ConsoleView's model
    * @return  string representation of the contents of this ConsoleView's model
    */
-  /*
   private String buildString() {
-    int length = this.getLength();
+    int length = model.getLength();
     if (length == 0) {
       return "";
     }
 
     // find the highest and lowest notes in this Song
-    Playable lowest = null;
-    Playable highest = null;
-    for (List<Playable> row : this.notes.values()) {
-      for (Playable playable : row) {
-        if (lowest == null || playable.compareTo(lowest) < 0) {
-          lowest = playable;
-        }
-        else if (highest == null || playable.compareTo(highest) > 0) {
-          highest = playable;
-        }
-      }
-    }
+    Playable lowest = model.getLowest();
+    Playable highest = model.getHighest();
+
 
     // get the pitches and octaves of the highest and lowest notes
     int lowestOctave = lowest.getOctave();
@@ -65,14 +55,15 @@ public class ConsoleView implements View {
 
     // initialize a List of Arrays containing the characters to print for each line
     List<String[]> output = new ArrayList<String[]>();
-    for (int i = 0; i <= this.getLength(); i++) {
+    for (int i = 0; i < model.getLength(); i++) {
       output.add(new String[width]);
     }
 
 
     // mark each of the arrays where a Note is with either a "X" or a "|"
-    for (List<Playable> row : this.notes.values()) {
-      for (Playable playable : row) {
+    for (int beat = 0; beat < length; ++ beat) {
+      List<Playable> notes = model.getNotes(beat);
+      for (Playable playable : notes) {
         int startBeat = playable.getStartBeat();
         int endBeat = startBeat + playable.getDuration();
 
@@ -81,43 +72,59 @@ public class ConsoleView implements View {
                 (playable.getPitch().ordinal() - lowestPitch.ordinal());
 
         // iterate through every beat that the note sustains for and add the appropriate symbol
-        for (int beat = startBeat; beat < endBeat; beat++) {
-          String symbol = (beat == startBeat) ? "X" : "|";
+        for (int noteBeat = startBeat; noteBeat < endBeat; noteBeat++) {
+          String symbol = (noteBeat == startBeat) ? "X" : "|";
           // only overwrite the symbol that is currently there if it is not an "X"
-          if (output.get(beat)[noteIndex] != "X") {
-            output.get(beat)[noteIndex] = symbol;
+          if (output.get(noteBeat)[noteIndex] != "X") {
+            output.get(noteBeat)[noteIndex] = symbol;
           }
         }
       }
     }
 
+    // find the number of spaces that each line number must take up
+    int lineNumberLength = Integer.toString(model.getLength()).length();
+
     // construct the String to be returned based on the symbols in the List of Arrays
-    StringBuilder outputString = new StringBuilder("Beat ");
+    StringBuilder outputString = new StringBuilder();
+    outputString.append(String.format("%" + Integer.toString(lineNumberLength) + "s", ""));
     Pitch[] pitches = Pitch.values();
+
+    // track the width of each column in order to print notes with the correct spacing
+    // in case one column must be labeled with 4 characters
+    List<Integer> spaces = new ArrayList<Integer>();
 
     // add every necessary label to the top of the output string
     for (int i = 0; i < width; i++) {
-      String label = "";
-      label += pitches[(i + lowestPitch.ordinal()) % pitches.length].toString();
-      label += Integer.toString(lowestOctave + (i / pitches.length));
+      StringBuilder label = new StringBuilder();
+      Pitch pitch = pitches[(i + lowestPitch.ordinal()) % pitches.length];
+      label.append(pitch.toString());
+      label.append(Integer.toString(lowestOctave + (i / pitches.length)));
       // add a leading space to extend labels of length 2 to be 3 characters long
       if (label.length() == 2) {
-        label = " " + label;
+        label.insert(0, " ");
       }
+      else if (label.length() == 4) {
+        spaces.add(4);
+        continue;
+      }
+      spaces.add(3);
 
-      outputString.append(" " + label + " ");
+      outputString.append(label.toString());
     }
     outputString.append("\n");
 
     // add each beat number followed by the appropriate symbols for that row to the output string
     for (int rowIndex = 0; rowIndex < output.size(); rowIndex++) {
       String[] row = output.get(rowIndex);
-      outputString.append(String.format("%4s", Integer.toString(rowIndex)) + " ");
-      for (String str : row) {
+      outputString.append(String.format("%" + Integer.toString(lineNumberLength) + "s",
+              Integer.toString(rowIndex)));
+      for (int col = 0; col < row.length; ++ col) {
+        String str = row[col];
         if (str == null) {
-          str = " ";
+          str = "";
         }
-        outputString.append("  " + str + "  ");
+        outputString.append(this.centerString(str, spaces.get(col)));
       }
       outputString.append("\n");
     }
@@ -125,10 +132,25 @@ public class ConsoleView implements View {
   }
 
   /**
+   * Return a string containing the given string centered and with the given length
+   * @param str     the String to be centered
+   * @param length  the length of the resulting String
+   * @return  a string containing the given string centered and with the given length or
+   * the original string if its length is greater than or equal to the given length
+   */
+  private static String centerString(String str, int length) {
+    int origLength = str.length();
+    int trailingSpaces = (length - origLength) / 2;
+    int leadingSpaces = length - trailingSpaces - origLength;
+    return String.format("%" + Integer.toString(leadingSpaces) + "s", " ") +
+            str + String.format("%" + Integer.toString(trailingSpaces) + "s", " ");
+  }
+
+  /**
    * Renders this View's {@link MusicEditorModel}
    */
   @Override
   public void render() {
-
+    System.out.println(this.buildString());
   }
 }
