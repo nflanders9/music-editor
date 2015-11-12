@@ -24,9 +24,9 @@ public class NoteTest {
    * Initializes all local Notes for testing
    */
   private void init() {
-    this.c4 = new Note(0, 1, Pitch.C, 4, 0);
-    this.cs7 = new Note(9, 4, Pitch.Cs, 7, 3);
-    this.a12 = new Note(13, 5, Pitch.A, 12, 1);
+    this.c4 = new Note(0, 1, Pitch.C, 4, 0, 100);
+    this.cs7 = new Note(9, 4, Pitch.Cs, 7, 3, 100);
+    this.a12 = new Note(13, 5, Pitch.A, 12, 1, 100);
     this.fs0 = new Note(153, 7, Pitch.Fs, 0);
     this.gNeg2 = new Note(2, 2, Pitch.G, -2);
   }
@@ -54,7 +54,7 @@ public class NoteTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void testNegativeInstrumentID() {
-    new Note(1, 1, Pitch.C, 4, -1);
+    new Note(1, 1, Pitch.C, 4, -1, 100);
   }
 
   // tests the copy constructor
@@ -233,7 +233,7 @@ public class NoteTest {
     assert(!this.c4.equals(new Note(0, 1, Pitch.Cs, 4)));
     assert(!this.c4.equals(new Note(1, 1, Pitch.C, 5)));
     assert(!this.c4.equals(new Note(11, 13, Pitch.Cs, 5)));
-    assert(!this.c4.equals(new Note(11, 13, Pitch.Cs, 5, 6)));
+    assert(!this.c4.equals(new Note(11, 13, Pitch.Cs, 5, 6, 100)));
   }
 
   @Test

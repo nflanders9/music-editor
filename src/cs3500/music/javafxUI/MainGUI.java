@@ -82,10 +82,6 @@ public class MainGUI extends Application implements View {
    * @throws NullPointerException if gc is null
    */
   private void render(GraphicsContext gc, double seconds) {
-    if (model.getLength() == 0) {
-      return;
-    }
-
     gc.setFill(Color.LIGHTGREY);
     gc.fillRect(0, 0, JavaFXConstants.WINDOW_WIDTH, JavaFXConstants.WINDOW_HEIGHT);
 
@@ -117,10 +113,23 @@ public class MainGUI extends Application implements View {
     Playable highest = model.getHighest();
 
     // get the pitches and octaves of the highest and lowest notes
-    int lowestOctave = lowest.getOctave();
-    Pitch lowestPitch = lowest.getPitch();
-    int highestOctave = highest.getOctave();
-    Pitch highestPitch = highest.getPitch();
+    int lowestOctave;
+    Pitch lowestPitch;
+    int highestOctave;
+    Pitch highestPitch;
+    try {
+      lowestOctave = lowest.getOctave();
+      lowestPitch = lowest.getPitch();
+      highestOctave = highest.getOctave();
+      highestPitch = highest.getPitch();
+    }
+    catch (NullPointerException e) {
+      lowestOctave = 4;
+      lowestPitch = Pitch.C;
+      highestOctave = 5;
+      highestPitch = Pitch.C;
+    }
+
 
     // computes the width of the console needed to display the notes in this song
     int width = Math.abs(Pitch.distance(lowestPitch, lowestOctave,
@@ -163,13 +172,17 @@ public class MainGUI extends Application implements View {
           gc.setFill(JavaFXConstants.NOTE_SUSTAIN_COLOR);
         }
         int pitchNum = Pitch.distance(lowestPitch, lowestOctave, note.getPitch(), note.getOctave());
-        gc.fillRect((curBeat - minBeat) * JavaFXConstants.MEASURE_WIDTH / model.getBeatsPerMeasure()
-                        + JavaFXConstants.GRID_PADDING_LEFT,
-                JavaFXConstants.GRID_PADDING_TOP + JavaFXConstants.GRID_SPACING_VERT * pitchNum,
-                (JavaFXConstants.MEASURE_WIDTH / model.getBeatsPerMeasure()),
+        double start = (curBeat - minBeat) * JavaFXConstants.MEASURE_WIDTH / model.getBeatsPerMeasure()
+                + JavaFXConstants.GRID_PADDING_LEFT;
+        double displayStart = Math.max(start, JavaFXConstants.GRID_PADDING_LEFT);
+        double displayWidth = (JavaFXConstants.MEASURE_WIDTH / model.getBeatsPerMeasure()) - (displayStart - start);
+        gc.fillRect(displayStart,
+                JavaFXConstants.GRID_PADDING_TOP + JavaFXConstants.GRID_SPACING_VERT * (width - pitchNum - 1),
+                displayWidth,
                 JavaFXConstants.GRID_SPACING_VERT);
       }
     }
+
 
     // draw vertical measure lines
     gc.setFill(Color.BLACK);
@@ -193,8 +206,6 @@ public class MainGUI extends Application implements View {
     gc.setLineWidth(4);
     gc.strokeLine(xPos, JavaFXConstants.GRID_PADDING_TOP, xPos,
             JavaFXConstants.GRID_PADDING_TOP + width * JavaFXConstants.GRID_SPACING_VERT);
-    //gc.strokeLine(JavaFXConstants.GRID_PADDING_LEFT, JavaFXConstants.GRID_PADDING_TOP, JavaFXConstants.GRID_PADDING_LEFT,
-    //        JavaFXConstants.GRID_PADDING_TOP + width * JavaFXConstants.GRID_SPACING_VERT);
 
   }
 
@@ -225,7 +236,7 @@ public class MainGUI extends Application implements View {
       classModel = new Song();
       classModel.addNote(new Note(8, 4, Pitch.E, 4));
       classModel.addNote(new Note(16, 8, Pitch.G, 4));
-      classModel.addNote(new Note(2, 4, Pitch.D, 5));
+      classModel.addNote(new Note(28, 4, Pitch.D, 5));
       classModel.addNote(new Note(12, 2, Pitch.Gs, 4));
       classModel.addNote(new Note(2, 4, Pitch.B, 3));
     }
@@ -242,8 +253,11 @@ public class MainGUI extends Application implements View {
     MainGUI parent = this;
     new AnimationTimer() {
       public void handle(long currentNanoTime) {
-        double elapsed = (currentNanoTime - startNanoTime) / 1000000000.0; // in seconds
-        parent.render(gc, elapsed * 2);
+        // elapsed and max time are in seconds
+        double elapsed = (currentNanoTime - startNanoTime) / 1000000000.0;
+        double maxTime =
+                ((double) parent.model.getLength()) / ((double) parent.model.getTempo()) * 60;
+        parent.render(gc, Math.min(elapsed, maxTime));
       }
     }.start();
 

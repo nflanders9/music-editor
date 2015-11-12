@@ -37,6 +37,12 @@ public interface Playable extends Comparable {
   int getInstrumentID();
 
   /**
+   * Returns this Playable's volume
+   * @return  this Playable's volume
+   */
+  int getVolume();
+
+  /**
    * Sets this Playable's {@link Pitch} and returns a reference to this Playable
    * @param pitch the new Pitch of this Playable
    * @return      this Playable
@@ -74,6 +80,13 @@ public interface Playable extends Comparable {
    * @throws IllegalArgumentException if the given start beat is negative
    */
   Playable setInstrument(int instrument);
+
+  /**
+   * Sets this Playable's volume and returns a reference to this Playable
+   * @param volume  the new volume level
+   * @return        this Playable
+   */
+  Playable setVolume(int volume);
 
   /**
    * Returns a copy of the given Playable

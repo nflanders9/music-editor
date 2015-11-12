@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.TreeMap;
 
+import cs3500.music.util.CompositionBuilder;
+
 /**
  * Represents a song to be edited in a music editor
  */
@@ -32,6 +34,12 @@ public final class Song implements MusicEditorModel {
     this.notes = new TreeMap<Integer, List<Playable>>();
     this.tempo = 120;
     this.beatsPerMeasure = 4;
+  }
+
+  private Song(TreeMap<Integer, List<Playable>> notes, int tempo, int beatsPerMeasure) {
+    this.notes = (TreeMap<Integer, List<Playable>>) notes.clone();
+    this.tempo = tempo;
+    this.beatsPerMeasure = beatsPerMeasure;
   }
 
   /**
@@ -208,5 +216,83 @@ public final class Song implements MusicEditorModel {
       }
     }
     return output;
+  }
+
+  /**
+   * Return a builder for Songs
+   * @return  a Builder for Songs
+   */
+  public static Builder builder() {
+    return new Builder();
+  }
+  /**
+   * Represents a builder class for Song objects
+   */
+  public static final class Builder implements CompositionBuilder<MusicEditorModel> {
+
+    /**
+     * Represents the Playables the comprise this song as a map where the beat number is the key and
+     * the values are the lists of Playables that are either beginning or sustaining during that beat
+     */
+    private List<Playable> notes;
+
+    /**
+     * Represents the tempo of this song in beats per minute
+     */
+    private int tempo;
+
+    /**
+     * Represents the number of beats in on measure
+     */
+    private int beatsPerMeasure;
+
+    /**
+     * Constructs a new Song Builder object
+     */
+    public Builder() {
+      this.notes = new ArrayList<Playable>();
+      this.tempo = 120;
+      this.beatsPerMeasure = 4;
+    }
+
+    /**
+     * Constructs an actual composition, given the notes that have been added
+     *
+     * @return The new composition
+     */
+    @Override
+    public MusicEditorModel build() {
+      return new Song(this.notes, this.tempo, this.beatsPerMeasure);
+    }
+
+    /**
+     * Sets the tempo of the piece
+     *
+     * @param tempo The speed, in microseconds per beat
+     * @return This builder
+     */
+    @Override
+    public CompositionBuilder<MusicEditorModel> setTempo(int tempo) {
+      int bpm = (int) (60000000.0 / tempo);
+      System.out.println(bpm * 3);
+      this.tempo = bpm;
+      return this;
+    }
+
+    /**
+     * Adds a new note to the piece
+     *
+     * @param start      The start time of the note, in beats
+     * @param end        The end time of the note, in beats
+     * @param instrument The instrument number (to be interpreted by MIDI)
+     * @param pitch      The pitch (in the range [0, 127], where 60 represents C4, the middle-C on a
+     *                   piano)
+     * @param volume     The volume (in the range [0, 127])
+     */
+    @Override
+    public CompositionBuilder<MusicEditorModel> addNote(int start, int end, int instrument, int pitch, int volume) {
+      this.notes.add(new Note(start, end - start, Pitch.pitchFromMidi(pitch), Pitch.octaveFromMidi(pitch)));
+      return this;
+    }
   }
 }

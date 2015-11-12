@@ -41,6 +41,11 @@ public final class Note implements Playable {
   private int instrumentID;
 
   /**
+   * Represents the volume of this Note
+   */
+  private int volume;
+
+  /**
    * Constructs a Note with the default instrumentID
    * @param startBeat the beat that the note starts on
    * @param duration  the number of beats that the note lasts
@@ -69,12 +74,13 @@ public final class Note implements Playable {
    * or duration values are invalid
    * @throws NullPointerException if the given pitch is null
    */
-  public Note(int startBeat, int duration, Pitch pitch, int octave, int instrumentID) {
+  public Note(int startBeat, int duration, Pitch pitch, int octave, int instrumentID, int volume) {
     this(startBeat, duration, pitch, octave);
     if (instrumentID < 0) {
       throw new IllegalArgumentException("Invalid instrument ID");
     }
     this.instrumentID = instrumentID;
+    this.volume = volume;
   }
 
   /**
@@ -134,6 +140,15 @@ public final class Note implements Playable {
   @Override
   public int getInstrumentID() {
     return this.instrumentID;
+  }
+
+  /**
+   * Get the volume of this Note
+   * @return the volume of this Note
+   */
+  @Override
+  public int getVolume() {
+    return this.volume;
   }
 
   /**
@@ -201,6 +216,17 @@ public final class Note implements Playable {
       throw new IllegalArgumentException("Illegal instrument ID");
     }
     this.instrumentID = instrument;
+    return this;
+  }
+
+  /**
+   * Sets this Note's volume
+   * @param volume  the new volume level
+   * @return
+   */
+  @Override
+  public Playable setVolume(int volume) {
+    this.volume = volume;
     return this;
   }
 

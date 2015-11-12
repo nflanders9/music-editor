@@ -41,8 +41,8 @@ public class MusicEditorModelTest {
     n1 = new Note(1, 3, Pitch.Cs, 5);
     n2 = new Note(8, 1, Pitch.A, 3);
     n3 = new Note(6, 16, Pitch.Fs, 2);
-    n4 = new Note(5, 3, Pitch.G, 4, 2);
-    n5 = new Note(6, 7, Pitch.B, 5, 0);
+    n4 = new Note(5, 3, Pitch.G, 4, 2, 100);
+    n5 = new Note(6, 7, Pitch.B, 5, 0, 100);
 
     m0 = new Song();
     m1 = new Song(new ArrayList<Playable>(), 150, 4);
