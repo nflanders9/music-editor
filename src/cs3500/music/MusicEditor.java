@@ -3,6 +3,7 @@ package cs3500.music;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 
+import cs3500.music.consoleUI.MidiView;
 import cs3500.music.consoleUI.View;
 import cs3500.music.javafxUI.MainGUI;
 import cs3500.music.model.MusicEditorModel;
@@ -27,7 +28,14 @@ public final class MusicEditor {
     try {
       MusicEditorModel song = MusicReader.parseFile(new FileReader(filename), Song.builder());
       View view = new MainGUI(song);
+      View view2 = new MidiView(song);
+      view2.render();
       view.render();
+      try {
+        Thread.sleep(100000);
+      } catch (InterruptedException e) {
+
+      }
     }
     catch (FileNotFoundException e) {
       System.err.println("Unable to open " + filename);

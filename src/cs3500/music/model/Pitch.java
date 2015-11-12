@@ -25,7 +25,7 @@ public enum Pitch {
   }
 
   public static int getMidi(Pitch pitch, int octave) {
-    return 60 + Pitch.distance(pitch, octave, Pitch.C, 4);
+    return 60 + Pitch.distance(Pitch.C, 4, pitch, octave);
   }
 
   public static Pitch pitchFromMidi(int midi) {

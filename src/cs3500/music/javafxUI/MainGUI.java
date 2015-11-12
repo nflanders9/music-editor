@@ -17,11 +17,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.scene.paint.Paint.*;
-import javafx.scene.paint.RadialGradient.*;
 import javafx.scene.text.*;
 import javafx.stage.Stage;
 
@@ -88,24 +84,24 @@ public class MainGUI extends Application implements View {
     Objects.requireNonNull(gc);
     double beat = model.getTempo() * seconds / 60.0;
 
+
     // determine the fraction of a measure that this time corresponds to
     double measureFracOffset = 0;
     int minMeasure = 0;
     double minBeat = 0;
-    boolean scrolling = false;
     if ((beat / (double) model.getBeatsPerMeasure()) > JavaFXConstants.MAX_BAR_LOCATION) {
       measureFracOffset = (beat / model.getBeatsPerMeasure()) % 1.0;
       minMeasure = (int) beat / model.getBeatsPerMeasure() - (int) JavaFXConstants.MAX_BAR_LOCATION;
       minBeat = (beat / (double) model.getBeatsPerMeasure() - JavaFXConstants.MAX_BAR_LOCATION)
               * model.getBeatsPerMeasure();
-      //minBeat = beat * (double) model.getBeatsPerMeasure() / (double) model.getBeatsPerMeasure() - ;
-      scrolling = true;
     }
-    System.out.println(minBeat);
+
+
     // determines position of beat tracking bar
-    double xPos = Math.min((double) JavaFXConstants.GRID_PADDING_LEFT +
-                    beat * ((double) JavaFXConstants.MEASURE_WIDTH / (double) model.getBeatsPerMeasure()),
-            JavaFXConstants.MEASURE_WIDTH * JavaFXConstants.MAX_BAR_LOCATION + JavaFXConstants.GRID_PADDING_LEFT);
+    double xPos = Math.min((double) JavaFXConstants.GRID_PADDING_LEFT + beat *
+                    ((double) JavaFXConstants.MEASURE_WIDTH / (double) model.getBeatsPerMeasure()),
+            JavaFXConstants.MEASURE_WIDTH * JavaFXConstants.MAX_BAR_LOCATION +
+                    JavaFXConstants.GRID_PADDING_LEFT);
 
 
     // find the highest and lowest notes in this Song
@@ -135,6 +131,7 @@ public class MainGUI extends Application implements View {
     int width = Math.abs(Pitch.distance(lowestPitch, lowestOctave,
             highestPitch, highestOctave)) + 1;
 
+
     // draw horizontal grid lines and label them with a pitch
     Pitch[] pitches = Pitch.values();
     gc.setTextBaseline(VPos.CENTER);
@@ -151,7 +148,7 @@ public class MainGUI extends Application implements View {
       // only label the pitch if it is between two grid lines
       if (i < width) {
         Pitch pitch = pitches[(i + lowestPitch.ordinal()) % pitches.length];
-        gc.fillText(pitch.toString() + Integer.toString(lowestOctave + (i / pitches.length)), // TODO Fix octave numbers
+        gc.fillText(pitch.toString() + Integer.toString(lowestOctave + (i / pitches.length)),
                 JavaFXConstants.LABEL_PADDING_LEFT,
                 (width - i) * JavaFXConstants.GRID_SPACING_VERT +
                         JavaFXConstants.GRID_PADDING_TOP -
@@ -159,25 +156,35 @@ public class MainGUI extends Application implements View {
       }
     }
 
-    // draw notes
+    // draw notes at all visible beats
     for (int curBeat = (int) minBeat;
          curBeat < (int) beat + model.getBeatsPerMeasure() * JavaFXConstants.MAX_MEASURES_ON_SCREEN;
          curBeat++) {
       List<Playable> notes = model.getNotes(curBeat);
+
+      // draw every note at the given beat
       for (Playable note : notes) {
+        // set the color of the block based on whether the note is starting or sustaining
         if (note.getStartBeat() == curBeat) {
           gc.setFill(JavaFXConstants.NOTE_START_COLOR);
         }
         else {
           gc.setFill(JavaFXConstants.NOTE_SUSTAIN_COLOR);
         }
+
         int pitchNum = Pitch.distance(lowestPitch, lowestOctave, note.getPitch(), note.getOctave());
-        double start = (curBeat - minBeat) * JavaFXConstants.MEASURE_WIDTH / model.getBeatsPerMeasure()
+
+        // calculate the position and width to use to draw the note
+        double start = (curBeat - minBeat) *
+                JavaFXConstants.MEASURE_WIDTH / model.getBeatsPerMeasure()
                 + JavaFXConstants.GRID_PADDING_LEFT;
+
         double displayStart = Math.max(start, JavaFXConstants.GRID_PADDING_LEFT);
-        double displayWidth = (JavaFXConstants.MEASURE_WIDTH / model.getBeatsPerMeasure()) - (displayStart - start);
-        gc.fillRect(displayStart,
-                JavaFXConstants.GRID_PADDING_TOP + JavaFXConstants.GRID_SPACING_VERT * (width - pitchNum - 1),
+        double displayWidth = (JavaFXConstants.MEASURE_WIDTH /model.getBeatsPerMeasure()) -
+                (displayStart - start);
+
+        gc.fillRect(displayStart, JavaFXConstants.GRID_PADDING_TOP +
+                        JavaFXConstants.GRID_SPACING_VERT * (width - pitchNum - 1),
                 displayWidth,
                 JavaFXConstants.GRID_SPACING_VERT);
       }
@@ -186,8 +193,12 @@ public class MainGUI extends Application implements View {
 
     // draw vertical measure lines
     gc.setFill(Color.BLACK);
-    for (int measure = minMeasure; measure <= minMeasure + JavaFXConstants.MAX_MEASURES_ON_SCREEN; measure++) {
-      double linePos = JavaFXConstants.GRID_PADDING_LEFT + JavaFXConstants.MEASURE_WIDTH * (measure - minMeasure - measureFracOffset);
+    for (int measure = minMeasure;
+         measure <= minMeasure + JavaFXConstants.MAX_MEASURES_ON_SCREEN;
+         measure++) {
+      double linePos = JavaFXConstants.GRID_PADDING_LEFT + JavaFXConstants.MEASURE_WIDTH *
+              (measure - minMeasure - measureFracOffset);
+
       if (linePos >= JavaFXConstants.GRID_PADDING_LEFT) {
         gc.strokeLine(linePos,
                 JavaFXConstants.GRID_PADDING_TOP,
