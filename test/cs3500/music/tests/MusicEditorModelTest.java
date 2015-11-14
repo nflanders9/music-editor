@@ -248,4 +248,5 @@ public class MusicEditorModelTest {
     assertEquals(m3.getHighest(), n5);
     assertEquals(m3.getLowest(), n3);
   }
+
 }

@@ -158,7 +158,8 @@ public class MainGUI extends Application implements View {
       // only label the pitch if it is between two grid lines
       if (i < width) {
         Pitch pitch = pitches[(i + lowestPitch.ordinal()) % pitches.length];
-        gc.fillText(pitch.toString() + Integer.toString(lowestOctave + (i / pitches.length)),
+        gc.fillText(pitch.toString() + Integer.toString(
+                        Pitch.octaveFromMidi(Pitch.getMidi(lowestPitch, lowestOctave) + i)),
                 GUIConstants.LABEL_PADDING_LEFT,
                 (width - i) * GUIConstants.GRID_SPACING_VERT +
                         GUIConstants.GRID_PADDING_TOP -

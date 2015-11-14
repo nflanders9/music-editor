@@ -268,4 +268,18 @@ public class NoteTest {
     assertEquals(Pitch.distance(Pitch.B, 3, Pitch.C, 4), 1);
     assertEquals(Pitch.distance(Pitch.As, 4, Pitch.A, 7), 35);
   }
+
+  @Test
+  public void testMidiFunctions() {
+    init();
+    assertEquals(Pitch.getMidi(Pitch.C, 4), 60);
+    assertEquals(Pitch.getMidi(Pitch.Cs, 5), 73);
+    assertEquals(Pitch.octaveFromMidi(60), 4);
+    assertEquals(Pitch.octaveFromMidi(59), 3);
+    assertEquals(Pitch.octaveFromMidi(49), 3);
+    assertEquals(Pitch.pitchFromMidi(60), Pitch.C);
+    assertEquals(Pitch.pitchFromMidi(61), Pitch.Cs);
+    assertEquals(Pitch.pitchFromMidi(59), Pitch.B);
+    assertEquals(Pitch.pitchFromMidi(72), Pitch.C);
+  }
 }

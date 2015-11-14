@@ -1,5 +1,6 @@
 package cs3500.music.view;
 
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -20,6 +21,11 @@ public class ConsoleView implements View {
   private MusicEditorModel model;
 
   /**
+   * Represents the stream to send the output to
+   */
+  private PrintStream output;
+
+  /**
    * Constructs a ConsoleView with the given MusicEditorModel
    * @param model the MusicEditorModel to display
    * @throws NullPointerException if the given model is null
@@ -27,7 +33,20 @@ public class ConsoleView implements View {
   public ConsoleView(MusicEditorModel model) {
     Objects.requireNonNull(model);
     this.model = model;
+    this.output = System.out;
   }
+
+  /**
+   * Constructs a ConsoleView with the given MusicEditorModel and the given output stream
+   * @param model the MusicEditorModel to display
+   * @param output  the stream to send the output to
+   * @throws NullPointerException if the given model or output is null
+   */
+  public ConsoleView(MusicEditorModel model, PrintStream output) {
+    this(model);
+    this.output = output;
+  }
+
 
   /**
    * Constructs a view with a null model that must be set before rendering
@@ -41,12 +60,11 @@ public class ConsoleView implements View {
     this.model = model;
   }
 
-
   /**
    * Return a string representation of the contents of this ConsoleView's model
    * @return  string representation of the contents of this ConsoleView's model
    */
-  public String buildString() {
+  private String buildString() {
     int length = model.getLength();
     if (length == 0) {
       return "";
@@ -113,7 +131,8 @@ public class ConsoleView implements View {
       StringBuilder label = new StringBuilder();
       Pitch pitch = pitches[(i + lowestPitch.ordinal()) % pitches.length];
       label.append(pitch.toString());
-      label.append(Integer.toString(lowestOctave + (i / pitches.length)));
+      label.append(Integer.toString(
+              Pitch.octaveFromMidi(Pitch.getMidi(lowestPitch, lowestOctave) + i)));
       // add a leading space to extend labels of length 2 to be 3 characters long
       if (label.length() == 2) {
         label.insert(0, " ");
@@ -165,6 +184,6 @@ public class ConsoleView implements View {
    */
   @Override
   public void render() {
-    System.out.println(this.buildString());
+    output.print(this.buildString());
   }
 }
