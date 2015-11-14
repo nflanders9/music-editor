@@ -291,7 +291,7 @@ public final class Song implements MusicEditorModel {
      */
     @Override
     public CompositionBuilder<MusicEditorModel> addNote(int start, int end, int instrument, int pitch, int volume) {
-      this.notes.add(new Note(start, end - start, Pitch.pitchFromMidi(pitch), Pitch.octaveFromMidi(pitch)));
+      this.notes.add(new Note(start, end - start, Pitch.pitchFromMidi(pitch), Pitch.octaveFromMidi(pitch), instrument, volume));
       return this;
     }
   }

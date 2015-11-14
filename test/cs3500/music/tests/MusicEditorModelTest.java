@@ -7,17 +7,14 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import cs3500.music.MusicEditor;
-import cs3500.music.consoleUI.MidiView;
-import cs3500.music.consoleUI.View;
-import cs3500.music.javafxUI.MainGUI;
+import cs3500.music.view.MidiView;
+import cs3500.music.view.View;
 import cs3500.music.model.MusicEditorModel;
 import cs3500.music.model.Note;
 import cs3500.music.model.Pitch;
 import cs3500.music.model.Playable;
 import cs3500.music.model.Song;
 import cs3500.music.util.MusicReader;
-import javafx.application.Application;
 
 import static org.junit.Assert.*;
 
@@ -250,32 +247,5 @@ public class MusicEditorModelTest {
     assertEquals(m2.getLowest(), n3);
     assertEquals(m3.getHighest(), n5);
     assertEquals(m3.getLowest(), n3);
-  }
-
-
-  @Test
-  public void testConsoleView() {
-    init();
-    m0.addNote(new Note(0, 4, Pitch.C, 4));
-    m0.addNote(new Note(4, 4, Pitch.E, 4));
-    m0.addNote(new Note(8, 4, Pitch.G, 4));
-    m0.addNote(new Note(12, 4, Pitch.D, 4));
-    m0.addNote(new Note(16, 2, Pitch.Gs, 4));
-    m0.addNote(new Note(20, 4, Pitch.B, 4));
-    MusicEditorModel song = null;
-    try {
-      song = MusicReader.parseFile(new FileReader("mary-little-lamb.txt"), Song.builder());
-    } catch (FileNotFoundException e) {
-
-    }
-    View midi = new MidiView(song);
-    midi.render();
-    try {
-      Thread.sleep(1000000);
-    } catch (InterruptedException e) {
-
-    }
-    //View view = new MainGUI(m0);
-    //view.render();
   }
 }

@@ -1,9 +1,10 @@
-package cs3500.music.consoleUI;
+package cs3500.music.view;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import cs3500.music.MusicEditor;
 import cs3500.music.model.MusicEditorModel;
 import cs3500.music.model.Pitch;
 import cs3500.music.model.Playable;
@@ -29,10 +30,23 @@ public class ConsoleView implements View {
   }
 
   /**
+   * Constructs a view with a null model that must be set before rendering
+   */
+  public ConsoleView() {
+    this.model = null;
+  }
+
+  @Override
+  public void setModel(MusicEditorModel model) {
+    this.model = model;
+  }
+
+
+  /**
    * Return a string representation of the contents of this ConsoleView's model
    * @return  string representation of the contents of this ConsoleView's model
    */
-  private String buildString() {
+  public String buildString() {
     int length = model.getLength();
     if (length == 0) {
       return "";
