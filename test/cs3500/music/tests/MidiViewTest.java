@@ -75,7 +75,8 @@ public class MidiViewTest {
 
     init();
     try {
-      MusicEditorModel song = MusicReader.parseFile(new FileReader("mary-little-lamb.txt"), Song.builder());
+      MusicEditorModel song = MusicReader.parseFile(
+              new FileReader("mary-little-lamb.txt"),Song.builder());
       View view = new MidiView(song, new MockSynth(capture));
       view.render();
       try {
@@ -145,7 +146,8 @@ public class MidiViewTest {
 
     init();
     try {
-      MusicEditorModel song = MusicReader.parseFile(new FileReader("mystery-1.txt"), Song.builder());
+      MusicEditorModel song = MusicReader.parseFile(
+              new FileReader("mystery-1.txt"), Song.builder());
       View view = new MidiView(song, new MockSynth(capture));
       view.render();
       try {
@@ -216,7 +218,8 @@ public class MidiViewTest {
 
     init();
     try {
-      MusicEditorModel song = MusicReader.parseFile(new FileReader("mystery-2.txt"), Song.builder());
+      MusicEditorModel song = MusicReader.parseFile(
+              new FileReader("mystery-2.txt"), Song.builder());
       View view = new MidiView(song, new MockSynth(capture));
       view.render();
       try {

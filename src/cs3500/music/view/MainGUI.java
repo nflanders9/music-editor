@@ -186,7 +186,8 @@ public class MainGUI extends Application implements View {
           gc.setFill(colors.get(note.getInstrumentID()));
         }
 
-        int pitchNum = Pitch.distance(lowestPitch, lowestOctave, note.getPitch(), note.getOctave());
+        int pitchNum = Pitch.distance(lowestPitch, lowestOctave,
+                note.getPitch(), note.getOctave());
 
         // calculate the position and width to use to draw the note
         double start = (curBeat - minBeat) *

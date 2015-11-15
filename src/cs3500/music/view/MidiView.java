@@ -87,13 +87,16 @@ public class MidiView implements View {
     for (Playable p : this.model.getNotes(beat)) {
       if (p.getStartBeat() == beat) {
         MidiMessage start = new ShortMessage(
-                ShortMessage.NOTE_ON, p.getInstrumentID() - 1, Pitch.getMidi(p.getPitch(), p.getOctave()), 100);
+                ShortMessage.NOTE_ON, p.getInstrumentID() - 1,
+                Pitch.getMidi(p.getPitch(), p.getOctave()), 100);
         this.receiver.send(start, p.getStartBeat() * (60000000 / model.getTempo()));
       }
       if (p.getStartBeat() + p.getDuration() == beat + 1) {
         MidiMessage stop = new ShortMessage(
-                ShortMessage.NOTE_OFF, p.getInstrumentID() - 1, Pitch.getMidi(p.getPitch(), p.getOctave()), 100);
-        this.receiver.send(stop, (p.getStartBeat() + p.getDuration()) * (60000000 / model.getTempo()));
+                ShortMessage.NOTE_OFF, p.getInstrumentID() - 1,
+                Pitch.getMidi(p.getPitch(), p.getOctave()), 100);
+        this.receiver.send(stop, (p.getStartBeat() +
+                p.getDuration()) * (60000000 / model.getTempo()));
       }
     }
   }

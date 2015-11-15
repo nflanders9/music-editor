@@ -114,7 +114,8 @@ public interface Playable extends Comparable {
     }
     else {
       Playable other = (Playable) o;
-      return Pitch.distance(other.getPitch(), other.getOctave(), this.getPitch(), this.getOctave());
+      return Pitch.distance(other.getPitch(), other.getOctave(),
+              this.getPitch(), this.getOctave());
     }
   }
 }

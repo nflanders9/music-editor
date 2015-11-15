@@ -231,8 +231,9 @@ public final class Song implements MusicEditorModel {
   public static final class Builder implements CompositionBuilder<MusicEditorModel> {
 
     /**
-     * Represents the Playables the comprise this song as a map where the beat number is the key and
-     * the values are the lists of Playables that are either beginning or sustaining during that beat
+     * Represents the Playables the comprise this song as a map where the beat number is the
+     * key and the values are the lists of Playables that are either beginning or sustaining
+     * during that beat
      */
     private List<Playable> notes;
 
@@ -285,13 +286,15 @@ public final class Song implements MusicEditorModel {
      * @param start      The start time of the note, in beats
      * @param end        The end time of the note, in beats
      * @param instrument The instrument number (to be interpreted by MIDI)
-     * @param pitch      The pitch (in the range [0, 127], where 60 represents C4, the middle-C on a
-     *                   piano)
+     * @param pitch      The pitch (in the range [0, 127], where 60 represents C4,
+     *                   the middle-C on a piano)
      * @param volume     The volume (in the range [0, 127])
      */
     @Override
-    public CompositionBuilder<MusicEditorModel> addNote(int start, int end, int instrument, int pitch, int volume) {
-      this.notes.add(new Note(start, end - start, Pitch.pitchFromMidi(pitch), Pitch.octaveFromMidi(pitch), instrument, volume));
+    public CompositionBuilder<MusicEditorModel> addNote(int start, int end, int instrument,
+                                                        int pitch, int volume) {
+      this.notes.add(new Note(start, end - start, Pitch.pitchFromMidi(pitch),
+              Pitch.octaveFromMidi(pitch), instrument, volume));
       return this;
     }
   }
