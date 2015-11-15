@@ -2,10 +2,18 @@ package cs3500.music.view;
 
 import java.util.Objects;
 
-import javax.sound.midi.*;
+import javax.sound.midi.InvalidMidiDataException;
+import javax.sound.midi.MidiMessage;
+import javax.sound.midi.MidiSystem;
+import javax.sound.midi.MidiUnavailableException;
+import javax.sound.midi.Receiver;
+import javax.sound.midi.ShortMessage;
+import javax.sound.midi.Synthesizer;
 
-import cs3500.music.MusicEditor;
-import cs3500.music.model.*;
+import cs3500.music.model.MusicEditorModel;
+import cs3500.music.model.Pitch;
+import cs3500.music.model.Playable;
+
 /**
  * represents the view of a musical editor through sound of the song
  */
@@ -41,6 +49,25 @@ public class MidiView implements View {
   }
 
   /**
+   * Construct a MidiView with the specified model and synthesizer
+   * @param model the model to display with this view
+   * @param synth the synthsizer Midi object
+   * @throws NullPointerException if the given model is null
+   */
+  public MidiView(MusicEditorModel model, Synthesizer synth) {
+    this.model = Objects.requireNonNull(model);
+    this.synth = synth;
+    Receiver rcvr = null;
+    try {
+      rcvr = synth.getReceiver();
+    }
+    catch (MidiUnavailableException e) {
+      System.err.println("unable to access Midi receiver");
+    }
+    this.receiver = rcvr;
+  }
+
+  /**
    * Construct a new MidiView with a null model that must be set before rendering
    */
   public MidiView() {
@@ -56,7 +83,7 @@ public class MidiView implements View {
    * Renders the MidiView based on the given model, by playing all of the notes
    * in the model
    */
-  public void playNotes(int beat) throws InvalidMidiDataException {
+  private void playNotes(int beat) throws InvalidMidiDataException {
     for (Playable p : this.model.getNotes(beat)) {
       if (p.getStartBeat() == beat) {
         MidiMessage start = new ShortMessage(
@@ -82,6 +109,7 @@ public class MidiView implements View {
     catch (InvalidMidiDataException e){
 
     }
+
     this.receiver.close();
 
   }
