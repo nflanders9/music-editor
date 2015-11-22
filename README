@@ -47,3 +47,10 @@ Finally, the MidiView class implements the View interface in such a way that the
 within it is rendered audibly through MIDI. All of these views can be constructed through the
 ViewFactory class which contains a method that returns various types of views based on a String
 argument passed to it.
+
+
+
+*************************************************
+NEWLY ADDED FOR ASSIGNMENT 7:
+
+ - refactor render method on View interface to take a timestamp to render at

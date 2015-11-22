@@ -24,12 +24,13 @@ public final class MusicEditor {
     try {
       MusicEditorModel song = MusicReader.parseFile(new FileReader(filename), Song.builder());
       View view = ViewFactory.makeView(mode, song);
-      view.render();
-      try {
-        Thread.sleep(song.getLength() * (60000000 / song.getTempo()));
-      } catch (InterruptedException e) {
-
-      }
+      view.render(0);
+//      try {
+//
+//        Thread.sleep(song.getLength() * (60000000 / song.getTempo()));
+//      } catch (InterruptedException e) {
+//
+//      }
     }
     catch (FileNotFoundException e) {
       System.err.println("Unable to open " + filename);

@@ -1,21 +1,25 @@
 package cs3500.music.view;
 
+import java.awt.event.KeyListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import cs3500.music.controller.Controller;
+import cs3500.music.controller.KeyEventAdapter;
+import cs3500.music.controller.KeyboardHandler;
 import cs3500.music.model.MusicEditorModel;
-import cs3500.music.model.Note;
 import cs3500.music.model.Pitch;
 import cs3500.music.model.Playable;
-import cs3500.music.model.Song;
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.*;
 import javafx.scene.paint.Color;
@@ -25,7 +29,27 @@ import javafx.stage.Stage;
 /**
  * Represents a javafxUI for displaying a {@link cs3500.music.model.MusicEditorModel} graphically
  */
-public class MainGUI extends Application implements View {
+public class MainGUI extends Application implements GuiView {
+
+  /**
+   * Represents the model that this instance of MainGUI will render
+   */
+  private ViewModel model;
+
+  /**
+   * Represents the model that this MainGUI will default to
+   */
+  private static ViewModel classModel;
+
+  /**
+   * Represents the KeyListener that controls the music editor
+   */
+  private KeyListener keyListener;
+
+  /**
+   * Represents the timestamp in seconds that the view is currently rendering
+   */
+  private double timestamp;
 
   /**
    * Entry point for the JavaFX UI view
@@ -40,24 +64,15 @@ public class MainGUI extends Application implements View {
    * @param model the model to associate with the MainGUI class
    */
   public static void setClassModel(MusicEditorModel model) {
-    MainGUI.classModel = model;
+    MainGUI.classModel = new MusicEditorViewModel(model);
   }
-
-  /**
-   * Represents the model that this instance of MainGUI will render
-   */
-  private MusicEditorModel model;
-
-  /**
-   * Represents the model that this MainGUI will default to
-   */
-  private static MusicEditorModel classModel;
 
   /**
    * Constructs a MainGUI with the default configuration
    */
   public MainGUI() {
     this.model = classModel;
+    this.timestamp = 0;
   }
 
   /**
@@ -68,8 +83,9 @@ public class MainGUI extends Application implements View {
    */
   public MainGUI(MusicEditorModel model) {
     Objects.requireNonNull(model);
-    MainGUI.classModel = model;
-    this.model = model;
+    MainGUI.classModel = new MusicEditorViewModel(model);
+    this.model = classModel;
+    this.timestamp = 0;
   }
 
   /**
@@ -78,8 +94,26 @@ public class MainGUI extends Application implements View {
    */
   @Override
   public void setModel(MusicEditorModel model) {
-    this.model = model;
+    this.model = new MusicEditorViewModel(model);
   }
+
+  @Override
+  public ViewModel getViewModel() {
+    return this.model;
+  }
+
+
+  /**
+   * Adds the given KeyListener to this GuiView
+   * @param listener the KeyListener to add
+   * @throws NullPointerException if the given KeyListener is null
+   */
+  @Override
+  public void addKeyListener(KeyListener listener) {
+    Objects.requireNonNull(listener);
+    this.keyListener = listener;
+  }
+
 
   /**
    * Render the model at the given beat to the given GraphicsContext
@@ -239,7 +273,7 @@ public class MainGUI extends Application implements View {
    * Renders this View's {@link MusicEditorModel}
    */
   @Override
-  public void render() {
+  public void render(double timestamp) {
     String[] args = new String[0];
     launch(args);
   }
@@ -262,6 +296,26 @@ public class MainGUI extends Application implements View {
     this.model = classModel;
     StackPane root = new StackPane();
     Scene scene = new Scene(root, GUIConstants.WINDOW_WIDTH, GUIConstants.WINDOW_HEIGHT);
+    this.keyListener = new KeyboardHandler();
+    // sets the key listener for the JavaFX application to use Swing KeyEvents
+    scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
+      @Override
+      public void handle(KeyEvent event) {
+        if (keyListener != null) {
+          if (event.getEventType() == KeyEvent.KEY_PRESSED) {
+            System.out.println(new KeyEventAdapter(event).getKeyCode());
+            keyListener.keyPressed(new KeyEventAdapter(event));
+          }
+          else if (event.getEventType() == KeyEvent.KEY_RELEASED) {
+            keyListener.keyReleased(new KeyEventAdapter(event));
+          }
+          else if (event.getEventType() == KeyEvent.KEY_TYPED) {
+            keyListener.keyTyped(new KeyEventAdapter(event));
+          }
+        }
+      }
+    });
+
     Canvas canvas = new Canvas(GUIConstants.WINDOW_WIDTH, GUIConstants.WINDOW_HEIGHT);
     GraphicsContext gc = canvas.getGraphicsContext2D();
     root.getChildren().add(canvas);
@@ -270,6 +324,7 @@ public class MainGUI extends Application implements View {
 
     final long startNanoTime = System.nanoTime();
     MainGUI parent = this;
+    /*
     new AnimationTimer() {
       Map<Integer, LinearGradient> colors = new HashMap<Integer, LinearGradient>();
       public void handle(long currentNanoTime) {
@@ -280,7 +335,8 @@ public class MainGUI extends Application implements View {
         parent.render(gc, Math.min(elapsed, maxTime), colors);
       }
     }.start();
-
+  */
+    parent.render(gc, 0, new HashMap<Integer, LinearGradient>());
     primaryStage.show();
   }
 

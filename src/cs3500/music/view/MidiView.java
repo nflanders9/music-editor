@@ -1,6 +1,8 @@
 package cs3500.music.view;
 
 import java.util.Objects;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.sound.midi.InvalidMidiDataException;
 import javax.sound.midi.MidiMessage;
@@ -20,7 +22,12 @@ import cs3500.music.model.Playable;
 public class MidiView implements View {
   private final Synthesizer synth;
   private final Receiver receiver;
-  private MusicEditorModel model;
+  private ViewModel model;
+
+  /**
+   * Represents the number of the last beat that was played by this model
+   */
+  private int lastBeat;
 
   /**
    * Constructs a default MidiView by constructing a synthesizer and
@@ -45,7 +52,7 @@ public class MidiView implements View {
       System.err.println("Midi device is unavailable");
     }
     this.receiver = rcvr;
-    this.model = model;
+    this.model = new MusicEditorViewModel(model);
   }
 
   /**
@@ -55,7 +62,8 @@ public class MidiView implements View {
    * @throws NullPointerException if the given model is null
    */
   public MidiView(MusicEditorModel model, Synthesizer synth) {
-    this.model = Objects.requireNonNull(model);
+    Objects.requireNonNull(model);
+    this.model = new MusicEditorViewModel(model);
     this.synth = synth;
     Receiver rcvr = null;
     try {
@@ -76,7 +84,13 @@ public class MidiView implements View {
 
   @Override
   public void setModel(MusicEditorModel model) {
-    this.model = Objects.requireNonNull(model);
+    Objects.requireNonNull(model);
+    this.model = new MusicEditorViewModel(model);
+  }
+
+  @Override
+  public ViewModel getViewModel() {
+    return this.model;
   }
 
   /**
@@ -102,7 +116,26 @@ public class MidiView implements View {
   }
 
   @Override
-  public void render() {
+  public void render(double timestamp) {
+    Objects.requireNonNull(this.model);
+    try {
+      int beatNum = (int) Math.ceil(((timestamp * 1000.0) / 60.0) * model.getTempo());
+      System.out.print("BEAT:  ");
+      System.out.println(beatNum);
+      if (beatNum != this.lastBeat) {
+        this.playNotes(beatNum);
+        this.lastBeat = beatNum;
+      }
+    }
+    catch (InvalidMidiDataException e){
+
+    }
+
+    this.receiver.close();
+
+  }
+
+  public void playAll() {
     Objects.requireNonNull(this.model);
     try {
       for (int beat = 0; beat < model.getLength(); beat++) {

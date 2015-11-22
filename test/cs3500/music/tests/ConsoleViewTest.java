@@ -72,13 +72,13 @@ public class ConsoleViewTest {
   public void testConsoleView() throws Exception {
     init();
     View view0 = new ConsoleView(empty, new PrintStream(mockOutput));
-    view0.render();
+    view0.render(0);
     System.out.println(capture.toString());
     assertEquals(capture.toString(), "");
 
     init();
     View view1 = new ConsoleView(song, new PrintStream(mockOutput));
-    view1.render();
+    view1.render(0);
     assertEquals(capture.toString(),
             "  F#2 G2G#2 A2A#2 B2 C3C#3 D3D#3 E3 F3F#3 G3G#3 A3A#3 B3 C4C#4 D4D#4 E4 F4F#4" +
                     " G4G#4 A4A#4 B4 C5C#5 D5D#5 E5 F5F#5 G5G#5 A5A#5 B5\n" +
@@ -129,7 +129,7 @@ public class ConsoleViewTest {
 
     init();
     View view2 = new ConsoleView(chord, new PrintStream(mockOutput));
-    view2.render();
+    view2.render(0);
     assertEquals(capture.toString(),
                     "  C4C#4 D4D#4 E4 F4F#4 G4\n" +
                     "0 X           X        X \n" +
@@ -140,7 +140,7 @@ public class ConsoleViewTest {
 
     init();
     View view3 = new ConsoleView(arpeggio, new PrintStream(mockOutput));
-    view3.render();
+    view3.render(47);
     assertEquals(capture.toString(),
                     "  C4C#4 D4D#4 E4 F4F#4 G4\n" +
                     "0 X                      \n" +

@@ -18,7 +18,7 @@ public class ConsoleView implements View {
   /**
    * Represents the model to be rendered
    */
-  private MusicEditorModel model;
+  private ViewModel model;
 
   /**
    * Represents the stream to send the output to
@@ -32,7 +32,7 @@ public class ConsoleView implements View {
    */
   public ConsoleView(MusicEditorModel model) {
     Objects.requireNonNull(model);
-    this.model = model;
+    this.model = new MusicEditorViewModel(model);
     this.output = System.out;
   }
 
@@ -57,7 +57,12 @@ public class ConsoleView implements View {
 
   @Override
   public void setModel(MusicEditorModel model) {
-    this.model = model;
+    this.model = new MusicEditorViewModel(model);
+  }
+
+  @Override
+  public ViewModel getViewModel() {
+    return this.model;
   }
 
   /**
@@ -183,7 +188,7 @@ public class ConsoleView implements View {
    * Renders this View's {@link MusicEditorModel}
    */
   @Override
-  public void render() {
+  public void render(double timestamp) {
     output.print(this.buildString());
   }
 }

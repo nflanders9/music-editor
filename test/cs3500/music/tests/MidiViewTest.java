@@ -69,16 +69,16 @@ public class MidiViewTest {
   @Test
   public void testMidiView() {
     init();
-    View view0 = new MidiView(empty, new MockSynth(capture));
-    view0.render();
+    MidiView view0 = new MidiView(empty, new MockSynth(capture));
+    view0.playAll();
     assertEquals(capture.toString(), "");
 
     init();
     try {
       MusicEditorModel song = MusicReader.parseFile(
               new FileReader("mary-little-lamb.txt"),Song.builder());
-      View view = new MidiView(song, new MockSynth(capture));
-      view.render();
+      MidiView view = new MidiView(song, new MockSynth(capture));
+      view.playAll();
       try {
         Thread.sleep(100);
       } catch (InterruptedException e) {
@@ -148,8 +148,8 @@ public class MidiViewTest {
     try {
       MusicEditorModel song = MusicReader.parseFile(
               new FileReader("mystery-1.txt"), Song.builder());
-      View view = new MidiView(song, new MockSynth(capture));
-      view.render();
+      MidiView view = new MidiView(song, new MockSynth(capture));
+      view.playAll();
       try {
         Thread.sleep(100);
       } catch (InterruptedException e) {
@@ -220,8 +220,8 @@ public class MidiViewTest {
     try {
       MusicEditorModel song = MusicReader.parseFile(
               new FileReader("mystery-2.txt"), Song.builder());
-      View view = new MidiView(song, new MockSynth(capture));
-      view.render();
+      MidiView view = new MidiView(song, new MockSynth(capture));
+      view.playAll();
       try {
         Thread.sleep(100);
       } catch (InterruptedException e) {

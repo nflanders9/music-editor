@@ -275,7 +275,6 @@ public final class Song implements MusicEditorModel {
     @Override
     public CompositionBuilder<MusicEditorModel> setTempo(int tempo) {
       int bpm = (int) (60000000.0 / tempo);
-      System.out.println(bpm * 3);
       this.tempo = bpm;
       return this;
     }

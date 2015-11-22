@@ -11,6 +11,7 @@ public final class ViewFactory {
       case "console": return new ConsoleView(model);
       case "visual":  return new MainGUI(model);
       case "midi":    return new MidiView(model);
+      case "full":    return new CompositeView(new MainGUI(model), new MidiView(model));
       default:        throw new IllegalArgumentException("unrecognized view type string");
     }
   }
