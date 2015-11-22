@@ -1,5 +1,7 @@
 package cs3500.music.view;
 
+import cs3500.music.controller.Controller;
+import cs3500.music.controller.GUIController;
 import cs3500.music.model.MusicEditorModel;
 
 /**
@@ -11,7 +13,13 @@ public final class ViewFactory {
       case "console": return new ConsoleView(model);
       case "visual":  return new MainGUI(model);
       case "midi":    return new MidiView(model);
-      case "full":    return new CompositeView(new MainGUI(model), new MidiView(model));
+      case "full":    MainGUI gui = new MainGUI(model);
+                      MidiView midi = new MidiView(model);
+                      CompositeView.setViews(gui, midi);
+                      GuiView view = new CompositeView(gui, midi);
+                      Controller controller = new GUIController(view);
+                      view.addKeyListener(controller.createKeyListener());
+                      return view;
       default:        throw new IllegalArgumentException("unrecognized view type string");
     }
   }

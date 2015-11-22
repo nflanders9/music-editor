@@ -161,8 +161,10 @@ public final class Song implements MusicEditorModel {
       return 0;
     }
     int lastBeat = this.notes.lastKey();
+    ensureInit(lastBeat);
     while (this.notes.get(lastBeat).size() == 0) {
       -- lastBeat;
+      ensureInit(lastBeat);
       if (lastBeat <= 0) {
         return 0;
       }

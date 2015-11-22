@@ -5,6 +5,12 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 
 import cs3500.music.view.GuiView;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.util.Duration;
 
 
 /**
@@ -43,14 +49,24 @@ public class GUIController implements Controller {
   @Override
   public KeyListener createKeyListener() {
     KeyboardHandler kh = new KeyboardHandler();
-    kh.installKeyTyped(KeyEvent.VK_SPACE, ()->{
-
+    kh.installKeyPressed(11, () -> {
+      Timeline playTimeline;
+      if (view.getViewModel().isPlaying()) {
+        view.getViewModel().setIsPlaying(false);
+        playTimeline = view.getTimeline();
+        playTimeline.stop();
+      }
+      else {
+        view.getViewModel().setIsPlaying(true);
+        playTimeline = view.play();
+      }
     });
     return kh;
   }
 
   @Override
   public void handleKey(KeyEvent event) {
+    System.out.println(event.getKeyCode());
     if (event.getID() == KeyEvent.KEY_PRESSED) {
       keyHandler.keyPressed(event);
     }

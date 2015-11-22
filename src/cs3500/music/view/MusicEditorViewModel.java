@@ -1,5 +1,6 @@
 package cs3500.music.view;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -24,6 +25,16 @@ public class MusicEditorViewModel implements ViewModel {
   List<Playable> selected;
 
   /**
+   * True if the view is currently playing the model
+   */
+  private boolean isPlaying;
+
+  /**
+   * Represents the current time in the musical composition
+   */
+  private double currentTime;
+
+  /**
    * Constructs a new MusicEditorViewModel based on the given MusicEditorModel
    * @param model the MusicEditorModel to adapt to the ViewModel interface
    * @throws NullPointerException if the given MusicEditorModel is null
@@ -31,6 +42,9 @@ public class MusicEditorViewModel implements ViewModel {
   public MusicEditorViewModel(MusicEditorModel model) {
     Objects.requireNonNull(model);
     this.model = model;
+    this.isPlaying = false;
+    this.selected = new ArrayList<Playable>();
+    this.currentTime = 0;
   }
 
   @Override
@@ -42,6 +56,26 @@ public class MusicEditorViewModel implements ViewModel {
   @Override
   public void select(Playable... playables) {
     this.selected.addAll(Arrays.asList(playables));
+  }
+
+  @Override
+  public boolean isPlaying() {
+    return this.isPlaying;
+  }
+
+  @Override
+  public void setIsPlaying(boolean isPlaying) {
+    this.isPlaying = isPlaying;
+  }
+
+  @Override
+  public double getCurrentTime() {
+    return this.currentTime;
+  }
+
+  @Override
+  public void setCurrentTime(double milliseconds) {
+    this.currentTime = milliseconds;
   }
 
 

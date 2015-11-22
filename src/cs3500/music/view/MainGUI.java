@@ -12,8 +12,12 @@ import cs3500.music.controller.KeyboardHandler;
 import cs3500.music.model.MusicEditorModel;
 import cs3500.music.model.Pitch;
 import cs3500.music.model.Playable;
+import javafx.animation.Animation;
 import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.VPos;
 import javafx.scene.Scene;
@@ -25,21 +29,17 @@ import javafx.scene.paint.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 /**
  * Represents a javafxUI for displaying a {@link cs3500.music.model.MusicEditorModel} graphically
  */
-public class MainGUI extends Application implements GuiView {
+public class MainGUI implements GuiView {
 
   /**
    * Represents the model that this instance of MainGUI will render
    */
   private ViewModel model;
-
-  /**
-   * Represents the model that this MainGUI will default to
-   */
-  private static ViewModel classModel;
 
   /**
    * Represents the KeyListener that controls the music editor
@@ -51,29 +51,10 @@ public class MainGUI extends Application implements GuiView {
    */
   private double timestamp;
 
-  /**
-   * Entry point for the JavaFX UI view
-   * @param args
-   */
-  public static void main(String[] args) {
-    launch(args);
-  }
-
-  /**
-   * Updates the static MusicEditorModel that is associated with this class
-   * @param model the model to associate with the MainGUI class
-   */
-  public static void setClassModel(MusicEditorModel model) {
-    MainGUI.classModel = new MusicEditorViewModel(model);
-  }
-
-  /**
-   * Constructs a MainGUI with the default configuration
-   */
-  public MainGUI() {
-    this.model = classModel;
-    this.timestamp = 0;
-  }
+  private final Canvas canvas;
+  private GraphicsContext gc;
+  private final Map<Integer, LinearGradient> colors;
+  private Timeline timeline;
 
   /**
    * Constructs an instance of a MainGUI and sets the class's static model
@@ -83,9 +64,20 @@ public class MainGUI extends Application implements GuiView {
    */
   public MainGUI(MusicEditorModel model) {
     Objects.requireNonNull(model);
-    MainGUI.classModel = new MusicEditorViewModel(model);
-    this.model = classModel;
+    this.canvas = new Canvas(GUIConstants.WINDOW_WIDTH, GUIConstants.WINDOW_HEIGHT);
+    this.gc = canvas.getGraphicsContext2D();
+    this.model = new MusicEditorViewModel(model);
     this.timestamp = 0;
+    this.colors = new HashMap<Integer, LinearGradient>();
+    this.timeline = null;
+  }
+
+  /**
+   * Renders this View's {@link MusicEditorModel} at the given timestamp in milliseconds
+   */
+  @Override
+  public void render(double timestamp) {
+    this.render(this.gc, timestamp, this.colors);
   }
 
   /**
@@ -112,6 +104,34 @@ public class MainGUI extends Application implements GuiView {
   public void addKeyListener(KeyListener listener) {
     Objects.requireNonNull(listener);
     this.keyListener = listener;
+  }
+
+  @Override
+  public Timeline play() {
+    double time = getViewModel().getCurrentTime();
+    Timeline timeline = new Timeline(new KeyFrame(
+            Duration.millis(5),
+            new EventHandler<ActionEvent>() {
+              double time = 0.0;
+              @Override
+              public void handle(ActionEvent event) {
+                if (getViewModel().isPlaying()) {
+                  render(time);
+                  getViewModel().setCurrentTime(time);
+                  time += .005;
+                }
+              }
+            })
+    );
+    timeline.setCycleCount(Animation.INDEFINITE);
+    timeline.play();
+    this.timeline = timeline;
+    return timeline;
+  }
+
+  @Override
+  public Timeline getTimeline() {
+    return this.timeline;
   }
 
 
@@ -270,12 +290,11 @@ public class MainGUI extends Application implements GuiView {
   }
 
   /**
-   * Renders this View's {@link MusicEditorModel}
+   * Get the canvas for this view
+   * @return  the Canvas for this view
    */
-  @Override
-  public void render(double timestamp) {
-    String[] args = new String[0];
-    launch(args);
+  public Canvas getCanvas() {
+    return this.canvas;
   }
 
   /**
@@ -290,54 +309,6 @@ public class MainGUI extends Application implements GuiView {
    *                     stages, if needed, but they will not be primary stages and will not be
    *                     embedded in the browser.
    */
-  @Override
-  public void start(Stage primaryStage) throws Exception {
-    Objects.requireNonNull(classModel);
-    this.model = classModel;
-    StackPane root = new StackPane();
-    Scene scene = new Scene(root, GUIConstants.WINDOW_WIDTH, GUIConstants.WINDOW_HEIGHT);
-    this.keyListener = new KeyboardHandler();
-    // sets the key listener for the JavaFX application to use Swing KeyEvents
-    scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
-      @Override
-      public void handle(KeyEvent event) {
-        if (keyListener != null) {
-          if (event.getEventType() == KeyEvent.KEY_PRESSED) {
-            System.out.println(new KeyEventAdapter(event).getKeyCode());
-            keyListener.keyPressed(new KeyEventAdapter(event));
-          }
-          else if (event.getEventType() == KeyEvent.KEY_RELEASED) {
-            keyListener.keyReleased(new KeyEventAdapter(event));
-          }
-          else if (event.getEventType() == KeyEvent.KEY_TYPED) {
-            keyListener.keyTyped(new KeyEventAdapter(event));
-          }
-        }
-      }
-    });
 
-    Canvas canvas = new Canvas(GUIConstants.WINDOW_WIDTH, GUIConstants.WINDOW_HEIGHT);
-    GraphicsContext gc = canvas.getGraphicsContext2D();
-    root.getChildren().add(canvas);
-    primaryStage.setTitle("Music Editor");
-    primaryStage.setScene(scene);
-
-    final long startNanoTime = System.nanoTime();
-    MainGUI parent = this;
-    /*
-    new AnimationTimer() {
-      Map<Integer, LinearGradient> colors = new HashMap<Integer, LinearGradient>();
-      public void handle(long currentNanoTime) {
-        // elapsed and max time are in seconds
-        double elapsed = (currentNanoTime - startNanoTime) / 1000000000.0;
-        double maxTime =
-                ((double) parent.model.getLength()) / ((double) parent.model.getTempo()) * 60;
-        parent.render(gc, Math.min(elapsed, maxTime), colors);
-      }
-    }.start();
-  */
-    parent.render(gc, 0, new HashMap<Integer, LinearGradient>());
-    primaryStage.show();
-  }
 
 }

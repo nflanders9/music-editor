@@ -3,11 +3,13 @@ package cs3500.music;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 
+import cs3500.music.view.CompositeView;
 import cs3500.music.view.View;
 import cs3500.music.model.MusicEditorModel;
 import cs3500.music.model.Song;
 import cs3500.music.util.MusicReader;
 import cs3500.music.view.ViewFactory;
+import javafx.application.Application;
 
 /**
  * Entry point for the Music Editor program
@@ -24,7 +26,12 @@ public final class MusicEditor {
     try {
       MusicEditorModel song = MusicReader.parseFile(new FileReader(filename), Song.builder());
       View view = ViewFactory.makeView(mode, song);
-      view.render(0);
+      if (view instanceof CompositeView) {
+        Application.launch(CompositeView.class, new String[0]);
+      }
+      else {
+        view.render(0);
+      }
 //      try {
 //
 //        Thread.sleep(song.getLength() * (60000000 / song.getTempo()));

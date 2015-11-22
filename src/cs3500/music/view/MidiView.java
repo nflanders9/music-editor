@@ -119,9 +119,7 @@ public class MidiView implements View {
   public void render(double timestamp) {
     Objects.requireNonNull(this.model);
     try {
-      int beatNum = (int) Math.ceil(((timestamp * 1000.0) / 60.0) * model.getTempo());
-      System.out.print("BEAT:  ");
-      System.out.println(beatNum);
+      int beatNum = (int) Math.ceil((timestamp / 60.0) * model.getTempo());
       if (beatNum != this.lastBeat) {
         this.playNotes(beatNum);
         this.lastBeat = beatNum;
@@ -131,7 +129,7 @@ public class MidiView implements View {
 
     }
 
-    this.receiver.close();
+    //this.receiver.close();
 
   }
 

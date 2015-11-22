@@ -20,4 +20,24 @@ public interface ViewModel extends MusicEditorModel {
    * Selects the given Playables in this ViewModel
    */
   void select(Playable... playables);
+
+  /**
+   * Return true if the view is currently playing
+   */
+  boolean isPlaying();
+
+  /**
+   * Set whether or not the view is currently playing
+   */
+  void setIsPlaying(boolean isPlaying);
+
+  /**
+   * Return the current time in milliseconds of the musical composition
+   */
+  double getCurrentTime();
+
+  /**
+   * Set the current time in milliseconds of the musical composition
+   */
+  void setCurrentTime(double milliseconds);
 }
