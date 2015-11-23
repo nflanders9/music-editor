@@ -2,6 +2,7 @@ package cs3500.music.view;
 
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -61,6 +62,8 @@ public class CompositeView extends Application implements GuiView {
   private static KeyListener classKeyListener;
   private MouseListener mouseListener;
   private static MouseListener classMouseListener;
+  private MouseMotionListener mouseMotionListener;
+  private static MouseMotionListener classMouseMotionListener;
 
   private Stage primaryStage;
   private Timeline timeline;
@@ -129,6 +132,7 @@ public class CompositeView extends Application implements GuiView {
     // sets the key listener for the JavaFX application to use Swing KeyEvents
     this.keyListener = classKeyListener;
     this.mouseListener = classMouseListener;
+    this.mouseMotionListener = classMouseMotionListener;
     scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
       @Override
       public void handle(KeyEvent event) {
@@ -149,9 +153,33 @@ public class CompositeView extends Application implements GuiView {
       @Override
       public void handle(MouseEvent event) {
         if (mouseListener != null) {
-          mouseListener.mouseClicked(
+          if (event.getEventType() == MouseEvent.MOUSE_CLICKED) {
+            mouseListener.mouseClicked(
+                    new java.awt.event.MouseEvent(new Box(0), 0, 0, 0, (int)event.getX(),
+                            (int)event.getY(), 0, false, event.getButton().ordinal()));
+          }
+          else if (event.getEventType() == MouseEvent.MOUSE_PRESSED) {
+            System.out.println("PRESSED");
+            mouseListener.mousePressed(
+                    new java.awt.event.MouseEvent(new Box(0), 0, 0, 0, (int) event.getX(),
+                            (int) event.getY(), 0, false, event.getButton().ordinal()));
+          }
+          else if (event.getEventType() == MouseEvent.MOUSE_RELEASED) {
+            mouseListener.mouseReleased(
+                    new java.awt.event.MouseEvent(new Box(0), 0, 0, 0, (int)event.getX(),
+                            (int)event.getY(), 0, false, event.getButton().ordinal()));
+          }
+        }
+      }
+    });
+
+    scene.setOnMouseDragged(new EventHandler<MouseEvent>() {
+      @Override
+      public void handle(MouseEvent event) {
+        if (event != null) {
+          mouseMotionListener.mouseDragged(
                   new java.awt.event.MouseEvent(new Box(0), 0, 0, 0, (int)event.getX(),
-                          (int)event.getY(), 0, false));
+                          (int)event.getY(), 0, false, event.getButton().ordinal()));
         }
       }
     });
@@ -160,49 +188,6 @@ public class CompositeView extends Application implements GuiView {
     primaryStage.setTitle("Music Editor");
     primaryStage.setScene(scene);
 
-//    double time = 0;
-//    Timeline timeline = new Timeline(new KeyFrame(
-//            Duration.millis(5),
-//            new EventHandler<ActionEvent>() {
-//              double time = 0.0;
-//              @Override
-//              public void handle(ActionEvent event) {
-//                render(time);
-//                time += .005;
-//              }
-//            })
-//    );
-//    timeline.setCycleCount(Animation.INDEFINITE);
-//    timeline.play();
-    /*
-    Timer timer = new Timer("playTimer", false);
-    TimerTask task = new TimerTask() {
-      double time = 0.0;
-      @Override
-      public void run() {
-        System.out.println(time);
-        gui.render(time);
-        time += 1000.0;
-      }
-    };
-    timer.schedule(task, 1000, 1000);
-    */
-/*
-    new AnimationTimer() {
-      public void handle(long currentNanoTime) {
-        // elapsed and max time are in seconds
-        double elapsed = (currentNanoTime - startNanoTime) / 1000000000.0;
-        double maxTime =
-                ((double) gui.getViewModel().getLength()) / ((double) gui.getViewModel().getTempo()) * 60;
-        gui.render(Math.min(elapsed, maxTime));
-      }
-    }.start();
-*/
-//    this.render(0);
-//    primaryStage.show();
-//    Thread.sleep(3000);
-//    this.render(2000);
-//    Thread.sleep(3000);
     this.render(0);
     primaryStage.show();
   }
@@ -217,6 +202,12 @@ public class CompositeView extends Application implements GuiView {
   public void addMouseListener(MouseListener listener) {
     this.mouseListener = listener;
     classMouseListener = listener;
+  }
+
+  @Override
+  public void addMouseMotionListener(MouseMotionListener listener) {
+    this.mouseMotionListener = listener;
+    classMouseMotionListener = listener;
   }
 
   @Override
@@ -247,7 +238,12 @@ public class CompositeView extends Application implements GuiView {
   }
 
   @Override
-  public void mouseClick(int x, int y) {
-    gui.mouseClick(x, y);
+  public void mouseClick(int x, int y, boolean leftButton) {
+    gui.mouseClick(x, y, leftButton);
+  }
+
+  @Override
+  public void mouseDrag(int x, int y) {
+    gui.mouseDrag(x, y);
   }
 }

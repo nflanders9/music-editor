@@ -20,6 +20,7 @@ public final class ViewFactory {
                       Controller controller = new GUIController(view);
                       view.addKeyListener(controller.createKeyListener());
                       view.addMouseListener(controller.createMouseListener());
+                      view.addMouseMotionListener(controller.createMouseMotionListener());
                       return view;
       default:        throw new IllegalArgumentException("unrecognized view type string");
     }

@@ -1,7 +1,11 @@
 package cs3500.music.view;
 
+import com.sun.istack.internal.Nullable;
+
+import java.awt.*;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +57,11 @@ public class MainGUI implements GuiView {
    * Represents the MouseListener that controls the music editor
    */
   private MouseListener mouseListener;
+
+  /**
+   * Represents the MouseMotionListener that controls the music editor
+   */
+  private MouseMotionListener mouseMotionListener;
 
   /**
    * Represents the timestamp in seconds that the view is currently rendering
@@ -121,6 +130,12 @@ public class MainGUI implements GuiView {
   }
 
   @Override
+  public void addMouseMotionListener(MouseMotionListener listener) {
+    Objects.requireNonNull(listener);
+    this.mouseMotionListener = listener;
+  }
+
+  @Override
   public Timeline play() {
     double time = getViewModel().getCurrentTime();
     Timeline timeline = new Timeline(new KeyFrame(
@@ -148,8 +163,35 @@ public class MainGUI implements GuiView {
     return this.timeline;
   }
 
-  @Override
-  public void mouseClick(int x, int y) {
+  /**
+   * Return a dummy Playable value with the Pitch, octave, and start beat that was clicked on
+   * @param x x coordinate of the mouse click
+   * @param y y coordinate of the mouse click
+   * @return  a new Playable at the click location
+   */
+  private Playable getNewClickedNote(int x, int y) {
+    y -= GUIConstants.GRID_PADDING_TOP;
+    x -= GUIConstants.GRID_PADDING_LEFT;
+    Playable highest = model.getHighest();
+    Playable lowest = model.getLowest();
+    int beatNum = x / (GUIConstants.MEASURE_WIDTH / model.getBeatsPerMeasure());
+    int pitchNum = y / GUIConstants.GRID_SPACING_VERT;
+
+    Pitch pitch = Pitch.pitchFromMidi(
+            Pitch.getMidi(highest.getPitch(), highest.getOctave()) - pitchNum);
+    int octave = Pitch.octaveFromMidi(
+            Pitch.getMidi(highest.getPitch(), highest.getOctave()) - pitchNum);
+    beatNum = (int) ((model.getCurrentTime() * 60) / model.getTempo()) + beatNum;
+    return new Note(beatNum, 1, pitch, octave);
+  }
+
+  /**
+   * Return the Playable that was clicked or null if no Playable was clicked
+   * @param x x coordinate of the mouse click
+   * @param y y coordinate of the mouse click
+   * @return  the Playable that was clicked or null if no Playable was clicked
+   */
+  private Playable getClicked(int x, int y) {
     y -= GUIConstants.GRID_PADDING_TOP;
     x -= GUIConstants.GRID_PADDING_LEFT;
     Playable highest = model.getHighest();
@@ -163,18 +205,63 @@ public class MainGUI implements GuiView {
             Pitch.getMidi(highest.getPitch(), highest.getOctave()) - pitchNum);
 
     beatNum = (int) ((model.getCurrentTime() * 60) / model.getTempo()) + beatNum;
-    System.out.println(pitch);
-    System.out.println(beatNum);
-    boolean foundNote = false;
     for (Playable note : model.getNotes(beatNum)) {
       if (note.getPitch() == pitch && note.getOctave() == octave) {
-        model.select(note);
-        foundNote = true;
+        return note;
       }
     }
-    if (!foundNote) {
-      model.addNote(new Note(beatNum, 2, pitch, octave, 1, 100));
+    return null;
+  }
+
+  @Override
+  public void mouseClick(int x, int y, boolean leftButton) {
+    Playable clickedNote = getClicked(x, y);
+    if (clickedNote != null && leftButton) {
+      model.select(clickedNote);
     }
+    else if (clickedNote != null && !leftButton) {
+      model.removeNote(clickedNote);
+    }
+    else if (clickedNote == null && !leftButton) {
+      model.getSelected().clear();
+    }
+    else {
+      Playable newNote = getNewClickedNote(x, y);
+      newNote.setDuration(model.getNewNoteDuration());
+      newNote.setInstrument(model.getNewNoteInstrument());
+      model.addNote(newNote);
+    }
+    render(model.getCurrentTime());
+  }
+
+  @Override
+  public void mouseDrag(int x, int y) {
+    Playable foundNote = getClicked(x, y);
+    if (foundNote != null) {
+      model.select(foundNote);
+    }
+    int pitchDelta = 0;
+    int beatDelta = 0;
+    if (model.getDragOrigin() != null) {
+      beatDelta = (int) (x - model.getDragOrigin().getX()) /
+              (GUIConstants.MEASURE_WIDTH / model.getBeatsPerMeasure());
+      pitchDelta = (int) ((y - model.getDragOrigin().getY()) / GUIConstants.GRID_SPACING_VERT);
+
+      System.out.print("BEAT DELTA: ");
+      System.out.println(beatDelta);
+      System.out.print("PITCH DELTA: ");
+      System.out.println(pitchDelta);
+      for (Playable note : model.getSelected()) {
+        note.setStart(Math.max(note.getStartBeat() + beatDelta, 0));
+        note.setPitch(Pitch.pitchFromMidi(Pitch.getMidi(note.getPitch(), note.getOctave())
+                + pitchDelta));
+      }
+    }
+    if (pitchDelta > 0 || beatDelta > 0) {
+      model.setDragOrigin(new Point(x, y));
+      System.out.println("Dragged");
+    }
+
     render(model.getCurrentTime());
   }
 
@@ -350,6 +437,12 @@ public class MainGUI implements GuiView {
     gc.setLineWidth(4);
     gc.strokeLine(xPos, GUIConstants.GRID_PADDING_TOP, xPos,
             GUIConstants.GRID_PADDING_TOP + width * GUIConstants.GRID_SPACING_VERT);
+
+    // draw label for the current editor configuration
+    gc.fillText("Instrument being edited: " +
+            Integer.toString(model.getNewNoteInstrument()), 80, 12);
+    gc.fillText("Selected note duration: " +
+            Integer.toString(model.getNewNoteDuration()), 260, 12);
 
   }
 

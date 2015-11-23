@@ -116,8 +116,14 @@ public final class Song implements MusicEditorModel {
     if (beatNum < 0) {
       throw new IllegalArgumentException("Illegal beat number");
     }
-    this.ensureInit(beatNum);
-    return this.notes.get(beatNum);
+    // note: don't use ensureInit here as that causes lots of performance
+    // issues in the GUI if it puts a large key in the map
+    if (this.notes.containsKey(beatNum)) {
+      return this.notes.get(beatNum);
+    }
+    else {
+      return new ArrayList<Playable>();
+    }
   }
 
 
