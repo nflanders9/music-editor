@@ -174,14 +174,25 @@ public class MainGUI implements GuiView {
     x -= GUIConstants.GRID_PADDING_LEFT;
     Playable highest = model.getHighest();
     Playable lowest = model.getLowest();
-    int beatNum = x / (GUIConstants.MEASURE_WIDTH / model.getBeatsPerMeasure());
+    int beatNum = (x / (GUIConstants.MEASURE_WIDTH / model.getBeatsPerMeasure()));
     int pitchNum = y / GUIConstants.GRID_SPACING_VERT;
 
     Pitch pitch = Pitch.pitchFromMidi(
             Pitch.getMidi(highest.getPitch(), highest.getOctave()) - pitchNum);
     int octave = Pitch.octaveFromMidi(
             Pitch.getMidi(highest.getPitch(), highest.getOctave()) - pitchNum);
-    beatNum = (int) ((model.getCurrentTime() * 60) / model.getTempo()) + beatNum;
+
+    double beat = Math.round(model.getTempo() * model.getCurrentTime() / 60.0);
+    if (beat > GUIConstants.MAX_BAR_LOCATION * model.getBeatsPerMeasure()) {
+      beatNum = (int) ((Math.floor((model.getCurrentTime() * 60) / model.getTempo()) + (int) beat
+              + beatNum - (model.getBeatsPerMeasure() * GUIConstants.MAX_BAR_LOCATION)));
+      System.out.print("BEAT NUM: ");
+      System.out.println(beatNum);
+    }
+    else {
+      beatNum = (int) ((model.getCurrentTime() * 60) / model.getTempo()) + beatNum;
+    }
+
     return new Note(beatNum, 1, pitch, octave);
   }
 
@@ -204,7 +215,16 @@ public class MainGUI implements GuiView {
     int octave = Pitch.octaveFromMidi(
             Pitch.getMidi(highest.getPitch(), highest.getOctave()) - pitchNum);
 
-    beatNum = (int) ((model.getCurrentTime() * 60) / model.getTempo()) + beatNum;
+    double beat = Math.round(model.getTempo() * model.getCurrentTime() / 60.0);
+    if (beat > GUIConstants.MAX_BAR_LOCATION * model.getBeatsPerMeasure()) {
+      beatNum = (int) (((model.getCurrentTime() * 60) / model.getTempo()) + (int) beat
+              + beatNum - (model.getBeatsPerMeasure() * GUIConstants.MAX_BAR_LOCATION));
+      System.out.print("BEAT NUM: ");
+      System.out.println(beatNum);
+    }
+    else {
+      beatNum = (int) ((model.getCurrentTime() * 60) / model.getTempo()) + beatNum;
+    }
     for (Playable note : model.getNotes(beatNum)) {
       if (note.getPitch() == pitch && note.getOctave() == octave) {
         return note;
@@ -424,7 +444,7 @@ public class MainGUI implements GuiView {
                 GUIConstants.GRID_PADDING_TOP,
                 linePos,
                 GUIConstants.GRID_SPACING_VERT * (width + 2));
-        gc.fillText(Integer.toString(measure * 4),
+        gc.fillText(Integer.toString(measure * model.getBeatsPerMeasure()),
                 linePos,
                 GUIConstants.MEASURE_LABEL_PADDING);
       }
