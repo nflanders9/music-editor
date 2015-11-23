@@ -8,6 +8,7 @@ import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import cs3500.music.model.Pitch;
 import cs3500.music.model.Playable;
 import cs3500.music.view.GuiView;
 import cs3500.music.view.ViewModel;
@@ -85,6 +86,38 @@ public class GUIController implements Controller {
       }
     });
 
+    // handle up key
+    kh.installKeyPressed(17, () -> {
+      Playable currentLow = view.getLowBound();
+      Playable currentHigh = view.getHighBound();
+      int newLowMidi = Pitch.getMidi(currentLow.getPitch(), currentLow.getOctave()) + 1;
+      int newHighMidi = Pitch.getMidi(currentHigh.getPitch(), currentHigh.getOctave()) + 1;
+
+      // mutate the highest and lowest Playables to modify the view window
+      view.setLowBound(currentLow.setPitch(Pitch.pitchFromMidi(newLowMidi)).setOctave(
+              Pitch.octaveFromMidi(newLowMidi)));
+      view.setHighBound(currentHigh.setPitch(Pitch.pitchFromMidi(newHighMidi)).setOctave(
+              Pitch.octaveFromMidi(newHighMidi)));
+
+      view.render(view.getViewModel().getCurrentTime());
+    });
+
+    // handle down key
+    kh.installKeyPressed(19, () -> {
+      Playable currentLow = view.getLowBound();
+      Playable currentHigh = view.getHighBound();
+      int newLowMidi = Pitch.getMidi(currentLow.getPitch(), currentLow.getOctave()) - 1;
+      int newHighMidi = Pitch.getMidi(currentHigh.getPitch(), currentHigh.getOctave()) - 1;
+
+      // mutate the highest and lowest Playables to modify the view window
+      view.setLowBound(currentLow.setPitch(Pitch.pitchFromMidi(newLowMidi)).setOctave(
+              Pitch.octaveFromMidi(newLowMidi)));
+      view.setHighBound(currentHigh.setPitch(Pitch.pitchFromMidi(newHighMidi)).setOctave(
+              Pitch.octaveFromMidi(newHighMidi)));
+
+      view.render(view.getViewModel().getCurrentTime());
+    });
+
     // handle home key
     kh.installKeyPressed(15, () -> {
       ViewModel vm = view.getViewModel();
@@ -133,6 +166,7 @@ public class GUIController implements Controller {
       view.render(view.getViewModel().getCurrentTime());
     });
 
+    // handle delete key
     kh.installKeyPressed(81, () -> {
       view.render(view.getViewModel().getCurrentTime());
       ViewModel vm = view.getViewModel();
@@ -141,7 +175,6 @@ public class GUIController implements Controller {
         vm.removeNote(note);
       }
       view.render(view.getViewModel().getCurrentTime());
-
     });
 
     return kh;

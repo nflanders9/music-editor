@@ -127,7 +127,6 @@ public class MusicEditorViewModel implements ViewModel {
     this.dragOrigin = origin;
   }
 
-
   @Override
   public void addNote(Playable note) {
     model.addNote(note);
@@ -183,12 +182,10 @@ public class MusicEditorViewModel implements ViewModel {
     model.overlay(song);
   }
 
-
   @Override
   public Playable getHighest() {
     return model.getHighest();
   }
-
 
   @Override
   public Playable getLowest() {

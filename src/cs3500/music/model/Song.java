@@ -219,7 +219,7 @@ public final class Song implements MusicEditorModel {
         // updates the output if the current note is on the appropriate side of
         // the current output based whether we're looking for the highest or lowest
         if (output == null || (highest == (note.compareTo(output) >= 0))) {
-          output = note;
+          output = note.copy();
         }
       }
     }

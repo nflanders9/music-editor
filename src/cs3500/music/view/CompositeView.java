@@ -14,6 +14,7 @@ import javax.swing.*;
 import cs3500.music.controller.KeyEventAdapter;
 import cs3500.music.controller.KeyboardHandler;
 import cs3500.music.model.MusicEditorModel;
+import cs3500.music.model.Playable;
 import javafx.animation.Animation;
 import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
@@ -245,5 +246,25 @@ public class CompositeView extends Application implements GuiView {
   @Override
   public void mouseDrag(int x, int y) {
     gui.mouseDrag(x, y);
+  }
+
+  @Override
+  public Playable getHighBound() {
+    return gui.getHighBound();
+  }
+
+  @Override
+  public Playable getLowBound() {
+    return gui.getLowBound();
+  }
+
+  @Override
+  public void setHighBound(Playable note) {
+    gui.setHighBound(note);
+  }
+
+  @Override
+  public void setLowBound(Playable note) {
+    gui.setLowBound(note);
   }
 }

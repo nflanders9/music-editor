@@ -74,4 +74,5 @@ public interface ViewModel extends MusicEditorModel {
    * @param origin  the origin of a mouse drag event
    */
   void setDragOrigin(Point origin);
+
 }

@@ -1,7 +1,5 @@
 package cs3500.music.view;
 
-import com.sun.istack.internal.Nullable;
-
 import java.awt.*;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
@@ -11,31 +9,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import cs3500.music.controller.Controller;
-import cs3500.music.controller.GUIController;
-import cs3500.music.controller.KeyEventAdapter;
-import cs3500.music.controller.KeyboardHandler;
 import cs3500.music.model.MusicEditorModel;
 import cs3500.music.model.Note;
 import cs3500.music.model.Pitch;
 import cs3500.music.model.Playable;
 import javafx.animation.Animation;
-import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.VPos;
-import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
-import javafx.stage.Stage;
 import javafx.util.Duration;
 
 /**
@@ -63,6 +51,9 @@ public class MainGUI implements GuiView {
    */
   private MouseMotionListener mouseMotionListener;
 
+  private Playable highBound;
+  private Playable lowBound;
+
   /**
    * Represents the timestamp in seconds that the view is currently rendering
    */
@@ -87,6 +78,8 @@ public class MainGUI implements GuiView {
     this.timestamp = 0;
     this.colors = new HashMap<Integer, LinearGradient>();
     this.timeline = null;
+    this.highBound = model.getHighest();
+    this.lowBound = model.getLowest();
   }
 
   /**
@@ -285,6 +278,28 @@ public class MainGUI implements GuiView {
     render(model.getCurrentTime());
   }
 
+  @Override
+  public Playable getHighBound() {
+    return this.highBound;
+  }
+
+  @Override
+  public Playable getLowBound() {
+    return this.lowBound;
+  }
+
+  @Override
+  public void setHighBound(Playable note) {
+    Objects.requireNonNull(note);
+    this.highBound = note;
+  }
+
+  @Override
+  public void setLowBound(Playable note) {
+    Objects.requireNonNull(note);
+    this.lowBound = note;
+  }
+
 
   /**
    * Render the model at the given beat to the given GraphicsContext
@@ -320,8 +335,8 @@ public class MainGUI implements GuiView {
 
 
     // find the highest and lowest notes in this Song
-    Playable lowest = model.getLowest();
-    Playable highest = model.getHighest();
+    Playable lowest = getLowBound();
+    Playable highest = getHighBound();
 
     // get the pitches and octaves of the highest and lowest notes
     int lowestOctave;
@@ -399,7 +414,13 @@ public class MainGUI implements GuiView {
       List<Playable> notes = model.getNotes(curBeat);
 
       // draw every note at the given beat
+
       for (Playable note : notes) {
+        // don't draw the note if it is above or below the bounds of the window being rendered
+        if (note.compareTo(getHighBound()) > 0 || note.compareTo(getLowBound()) < 0) {
+          continue;
+        }
+
         // set the color of the block based on whether the note is starting or sustaining
         if (!colors.containsKey(note.getInstrumentID())) {
           colors.put(note.getInstrumentID(), GUIConstants.getNewColor());

@@ -4,6 +4,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
+import cs3500.music.model.Playable;
 import javafx.animation.Timeline;
 
 /**
@@ -52,4 +53,30 @@ public interface GuiView extends View {
    * @param y the y coordinate of the mouse being dragged
    */
   void mouseDrag(int x, int y);
+
+  /**
+   * Get the highest Playable to render in this GUI view
+   * @return  the highest Playable to render in this GUI view
+   */
+  Playable getHighBound();
+
+  /**
+   * Get the lowest Playable to render in this GUI view
+   * @return  the lowest Playable to render in this GUI view
+   */
+  Playable getLowBound();
+
+  /**
+   * Set the highest note to render in this GUI view
+   * @param note  the highest Playable to render in this GUI view
+   * @throws NullPointerException if the given Playable is null
+   */
+  void setHighBound(Playable note);
+
+  /**
+   * Set the lowest note to render in this GUI view
+   * @param note  the lowest Playable to render in this GUI view
+   * @throws NullPointerException if the given Playable is null
+   */
+  void setLowBound(Playable note);
 }
