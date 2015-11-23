@@ -1,11 +1,14 @@
 package cs3500.music.view;
 
 import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import javax.swing.*;
 
 import cs3500.music.controller.KeyEventAdapter;
 import cs3500.music.controller.KeyboardHandler;
@@ -22,6 +25,7 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.LinearGradient;
 import javafx.stage.Stage;
@@ -55,6 +59,9 @@ public class CompositeView extends Application implements GuiView {
 
   private KeyListener keyListener;
   private static KeyListener classKeyListener;
+  private MouseListener mouseListener;
+  private static MouseListener classMouseListener;
+
   private Stage primaryStage;
   private Timeline timeline;
 
@@ -121,6 +128,7 @@ public class CompositeView extends Application implements GuiView {
     Scene scene = new Scene(root, GUIConstants.WINDOW_WIDTH, GUIConstants.WINDOW_HEIGHT);
     // sets the key listener for the JavaFX application to use Swing KeyEvents
     this.keyListener = classKeyListener;
+    this.mouseListener = classMouseListener;
     scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
       @Override
       public void handle(KeyEvent event) {
@@ -133,6 +141,17 @@ public class CompositeView extends Application implements GuiView {
           } else if (event.getEventType() == KeyEvent.KEY_TYPED) {
             keyListener.keyTyped(new KeyEventAdapter(event));
           }
+        }
+      }
+    });
+
+    scene.setOnMouseClicked(new EventHandler<MouseEvent>() {
+      @Override
+      public void handle(MouseEvent event) {
+        if (mouseListener != null) {
+          mouseListener.mouseClicked(
+                  new java.awt.event.MouseEvent(new Box(0), 0, 0, 0, (int)event.getX(),
+                          (int)event.getY(), 0, false));
         }
       }
     });
@@ -195,6 +214,12 @@ public class CompositeView extends Application implements GuiView {
   }
 
   @Override
+  public void addMouseListener(MouseListener listener) {
+    this.mouseListener = listener;
+    classMouseListener = listener;
+  }
+
+  @Override
   public Timeline play() {
     Timeline timeline = new Timeline(new KeyFrame(
             Duration.millis(5),
@@ -219,5 +244,10 @@ public class CompositeView extends Application implements GuiView {
   @Override
   public Timeline getTimeline() {
     return this.timeline;
+  }
+
+  @Override
+  public void mouseClick(int x, int y) {
+    gui.mouseClick(x, y);
   }
 }

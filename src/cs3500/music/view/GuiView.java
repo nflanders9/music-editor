@@ -1,6 +1,7 @@
 package cs3500.music.view;
 
 import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
 
 import javafx.animation.Timeline;
 
@@ -16,6 +17,13 @@ public interface GuiView extends View {
   void addKeyListener(KeyListener listener);
 
   /**
+   * Adds the given MouseListener to this GuiView
+   * @param listener the MouseListener to add
+   * @throws NullPointerException if the given KeyListener is null
+   */
+  void addMouseListener(MouseListener listener);
+
+  /**
    * Plays the given view from the current time and returns the Timeline object
    */
   Timeline play();
@@ -25,4 +33,8 @@ public interface GuiView extends View {
    */
   Timeline getTimeline();
 
+  /**
+   * Handles a mouse click at the given x and y coordinates
+   */
+  void mouseClick(int x, int y);
 }

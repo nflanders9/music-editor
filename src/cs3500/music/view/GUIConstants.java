@@ -5,6 +5,7 @@ import java.util.Random;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Paint;
 import javafx.scene.paint.Stop;
 
 /**
@@ -27,6 +28,8 @@ final class GUIConstants {
   // represents the maximum number of measures to move the playing bar from the left side
   // of the screen before moving the notes underneath the bar instead
   static final double MAX_BAR_LOCATION = 3;
+
+  static final Color SELECT_COLOR = Color.LIGHTSEAGREEN;
 
   static final LinearGradient NOTE_START_COLOR =
           new LinearGradient(0, GUIConstants.GRID_PADDING_TOP,

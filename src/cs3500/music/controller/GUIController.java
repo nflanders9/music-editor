@@ -3,6 +3,7 @@ package cs3500.music.controller;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import cs3500.music.view.GuiView;
 import javafx.animation.Animation;
@@ -48,7 +49,10 @@ public class GUIController implements Controller {
 
   @Override
   public KeyListener createKeyListener() {
+    double HORIZONTAL_SCROLL_SCALE = 0.06;
     KeyboardHandler kh = new KeyboardHandler();
+
+    // handle space bar
     kh.installKeyPressed(11, () -> {
       Timeline playTimeline;
       if (view.getViewModel().isPlaying()) {
@@ -61,7 +65,57 @@ public class GUIController implements Controller {
         playTimeline = view.play();
       }
     });
+
+    // handle left key
+    kh.installKeyPressed(16, () -> {
+      if (!view.getViewModel().isPlaying()) {
+        view.getViewModel().setCurrentTime(Math.max(0,
+                view.getViewModel().getCurrentTime() - HORIZONTAL_SCROLL_SCALE));
+        view.render(view.getViewModel().getCurrentTime());
+      }
+    });
+
+    // handle right key
+    kh.installKeyPressed(18, () -> {
+      if (!view.getViewModel().isPlaying()) {
+        view.getViewModel().setCurrentTime(
+                view.getViewModel().getCurrentTime() + HORIZONTAL_SCROLL_SCALE);
+        view.render(view.getViewModel().getCurrentTime());
+      }
+    });
+
     return kh;
+  }
+
+  @Override
+  public MouseListener createMouseListener() {
+    MouseListener mouseListener = new MouseListener() {
+      @Override
+      public void mouseClicked(MouseEvent e) {
+        view.mouseClick(e.getX(), e.getY());
+      }
+
+      @Override
+      public void mousePressed(MouseEvent e) {
+
+      }
+
+      @Override
+      public void mouseReleased(MouseEvent e) {
+
+      }
+
+      @Override
+      public void mouseEntered(MouseEvent e) {
+
+      }
+
+      @Override
+      public void mouseExited(MouseEvent e) {
+
+      }
+    };
+    return mouseListener;
   }
 
   @Override

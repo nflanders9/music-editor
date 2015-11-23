@@ -19,6 +19,7 @@ public final class ViewFactory {
                       GuiView view = new CompositeView(gui, midi);
                       Controller controller = new GUIController(view);
                       view.addKeyListener(controller.createKeyListener());
+                      view.addMouseListener(controller.createMouseListener());
                       return view;
       default:        throw new IllegalArgumentException("unrecognized view type string");
     }

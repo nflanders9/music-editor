@@ -3,6 +3,7 @@ package cs3500.music.controller;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 
 /**
@@ -28,4 +29,9 @@ public interface Controller {
    * @return
    */
   KeyListener createKeyListener();
+
+  /**
+   * Creates a new MouseListener with actions associated with it
+   */
+  MouseListener createMouseListener();
 }
