@@ -4,6 +4,7 @@ import org.junit.Test;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
@@ -289,6 +290,39 @@ public class ControllerTest {
     keyListener.keyPressed(a);
     assertEquals(composite.getViewModel().getNotes(2).get(1), c4.setStart(2));
     assertEquals(composite.getViewModel().getNotes(11).get(0), cs7.setStart(11));
+  }
+
+
+  @Test
+  public void testMouseHandling() {
+    init();
+    // clicks on the beat 4, pitch F#12
+    MouseEvent click = new MouseEvent(new Box(0), 0, 0, 0, 100, 100, 1, false);
+
+    assertEquals(composite.getViewModel().getNotes(4).size(), 0);
+    composite.mouseClick(100, 100, true);
+    assertEquals(composite.getViewModel().getNotes(4).get(0).getPitch(),
+            Pitch.Fs);
+    assertEquals(composite.getViewModel().getNotes(4).get(0).getOctave(),
+            12);
+    assertEquals(composite.getViewModel().getNotes(4).get(0).getStartBeat(),
+            4);
+
+    // select the note that was just added
+    Playable addedNote = composite.getViewModel().getNotes(4).get(0);
+    assertEquals(composite.getViewModel().getSelected().size(), 0);
+    composite.mouseClick(100, 100, true);
+    assertEquals(composite.getViewModel().getSelected().get(0), addedNote);
+
+    // deselect the note by right clicking off all notes
+    composite.mouseClick(100, 0, false);
+    assertEquals(composite.getViewModel().getSelected().size(), 0);
+
+    // delete the note that was added by right clicking on it
+    composite.mouseClick(100, 100, false);
+    assertEquals(composite.getViewModel().getNotes(4).size(), 0);
+
+
 
   }
 

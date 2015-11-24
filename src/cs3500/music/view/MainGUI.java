@@ -202,7 +202,6 @@ public class MainGUI implements GuiView {
             Pitch.getMidi(highest.getPitch(), highest.getOctave()) - pitchNum);
 
 
-
     return new Note((int) Math.round(beat), 1, pitch, octave);
   }
 
