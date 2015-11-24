@@ -369,6 +369,10 @@ public class MainGUI implements GuiView {
 
     // draw highlighting behind every selected note
     for (Playable note : model.getSelected()) {
+      // don't draw the note if it is above or below the bounds of the window being rendered
+      if (note.compareTo(getHighBound()) > 0 || note.compareTo(getLowBound()) < 0) {
+        continue;
+      }
       int pitchNum = Pitch.distance(lowestPitch, lowestOctave,
               note.getPitch(), note.getOctave());
 
