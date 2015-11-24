@@ -143,7 +143,7 @@ public class GUIController implements Controller {
     });
 
 
-    // handle numeric keys 1 through 8 on the num row and num pad for selecting note duration
+    // handle numeric keys 1 through 9 on the num row and num pad for selecting note duration
     for (int i = 0; i < 9; ++ i) {
       final int finalIndex = i;
       Runnable runnable = () -> {
