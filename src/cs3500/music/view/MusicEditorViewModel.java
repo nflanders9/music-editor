@@ -46,11 +46,6 @@ public class MusicEditorViewModel implements ViewModel {
   private int newNoteInstrumentID;
 
   /**
-   * Represents the point that a mouse drag event started on
-   */
-  private Point dragOrigin;
-
-  /**
    * Constructs a new MusicEditorViewModel based on the given MusicEditorModel
    * @param model the MusicEditorModel to adapt to the ViewModel interface
    * @throws NullPointerException if the given MusicEditorModel is null
@@ -63,7 +58,6 @@ public class MusicEditorViewModel implements ViewModel {
     this.currentTime = 0;
     this.newNoteDuration = 2;
     this.newNoteInstrumentID = 1;
-    this.dragOrigin = null;
   }
 
   @Override
@@ -115,16 +109,6 @@ public class MusicEditorViewModel implements ViewModel {
   @Override
   public void setNewNoteInstrument(int id) {
     this.newNoteInstrumentID = id;
-  }
-
-  @Override
-  public Point getDragOrigin() {
-    return this.dragOrigin;
-  }
-
-  @Override
-  public void setDragOrigin(Point origin) {
-    this.dragOrigin = origin;
   }
 
   @Override

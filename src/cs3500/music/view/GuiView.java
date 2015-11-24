@@ -2,7 +2,6 @@ package cs3500.music.view;
 
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 
 import cs3500.music.model.Playable;
 import javafx.animation.Timeline;
@@ -25,13 +24,6 @@ public interface GuiView extends View {
    * @throws NullPointerException if the given MouseListener is null
    */
   void addMouseListener(MouseListener listener);
-
-  /**
-   * Adds the given MouseMotionListener to this GuiView
-   * @param listener the MouseMotionListener to add
-   * @throws NullPointerException if the given MouseMotionListener is null
-   */
-  void addMouseMotionListener(MouseMotionListener listener);
 
   /**
    * Plays the given view from the current time and returns the Timeline object

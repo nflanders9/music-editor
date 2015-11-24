@@ -13,8 +13,9 @@ public final class ViewFactory {
       case "console": return new ConsoleView(model);
       case "visual":  return new MainGUI(model);
       case "midi":    return new MidiView(model);
-      case "full":    MainGUI gui = new MainGUI(model);
-                      MidiView midi = new MidiView(model);
+      case "":
+      case "full":    GuiView gui = new MainGUI(model);
+                      View midi = new MidiView(model);
                       CompositeView.setViews(gui, midi);
                       GuiView view = new CompositeView(gui, midi);
                       Controller controller = new GUIController(view);

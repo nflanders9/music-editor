@@ -1,6 +1,5 @@
 package cs3500.music.view;
 
-import java.awt.*;
 import java.util.List;
 
 import cs3500.music.model.MusicEditorModel;
@@ -62,17 +61,5 @@ public interface ViewModel extends MusicEditorModel {
    * Sets the current instrumnet ID being edited
    */
   void setNewNoteInstrument(int id);
-
-  /**
-   * Get the origin of a mouse drag event
-   * @return  the origin of the mouse drag event or null if the mouse is not dragging
-   */
-  Point getDragOrigin();
-
-  /**
-   * Sets the origin of a mouse drag event
-   * @param origin  the origin of a mouse drag event
-   */
-  void setDragOrigin(Point origin);
 
 }

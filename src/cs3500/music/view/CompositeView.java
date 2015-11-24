@@ -2,34 +2,24 @@ package cs3500.music.view;
 
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.swing.*;
 
 import cs3500.music.controller.KeyEventAdapter;
-import cs3500.music.controller.KeyboardHandler;
 import cs3500.music.model.MusicEditorModel;
 import cs3500.music.model.Playable;
 import javafx.animation.Animation;
-import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
-import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
-import javafx.scene.paint.LinearGradient;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -58,15 +48,36 @@ public class CompositeView extends Application implements GuiView {
    */
   private View midi;
 
-
+  /**
+   * Represents a KeyListener for this composite view
+   */
   private KeyListener keyListener;
-  private static KeyListener classKeyListener;
-  private MouseListener mouseListener;
-  private static MouseListener classMouseListener;
-  private MouseMotionListener mouseMotionListener;
-  private static MouseMotionListener classMouseMotionListener;
 
+  /**
+   * Represents a KeyListener for new instances of this class
+   */
+  private static KeyListener classKeyListener;
+
+  /**
+   * Represents a MouseListener for this composite view
+   */
+  private MouseListener mouseListener;
+
+  /**
+   * Represents a MouseListener for new instances of this class
+   */
+  private static MouseListener classMouseListener;
+
+
+  /**
+   * Represents the main stage of this JavaFX application
+   */
   private Stage primaryStage;
+
+  /**
+   * Represents the timeline that is currently being used to animate the rendering of
+   * this CompositeView
+   */
   private Timeline timeline;
 
   /**
@@ -75,7 +86,7 @@ public class CompositeView extends Application implements GuiView {
    * @param gui  the graphical view to include
    * @param midi the MIDI view to include
    */
-  public CompositeView(MainGUI gui, MidiView midi) {
+  public CompositeView(GuiView gui, View midi) {
     Objects.requireNonNull(gui);
     Objects.requireNonNull(midi);
     this.gui = gui;
@@ -83,34 +94,54 @@ public class CompositeView extends Application implements GuiView {
     this.timeline = null;
   }
 
+  /**
+   * Construct a new CompositeView with the default class parameters as this is required by
+   * the JavaFX Application class
+   */
   public CompositeView() {
     this.gui = classGui;
     this.midi = classMidi;
     this.timeline = null;
   }
 
-  public static void setViews(MainGUI gui, MidiView midi) {
+  /**
+   * Set the views contained within this CompositeView
+   * @param gui   the GuiView to contain in this CompositeView
+   * @param midi  the MIDI View to contain in this CompositeView
+   */
+  public static void setViews(GuiView gui, View midi) {
     classGui = gui;
     classMidi = midi;
   }
 
   @Override
   public void render(double timestamp) {
-    if (this.gui != null && this.midi != null) {
-      this.midi.render(timestamp);
+    if (this.gui != null) {
       this.gui.render(timestamp);
+    }
+    if (this.midi != null) {
+      this.midi.render(timestamp);
     }
   }
 
   @Override
   public void setModel(MusicEditorModel model) {
-    this.midi.setModel(model);
-    this.gui.setModel(model);
+    if (this.midi != null) {
+      this.midi.setModel(model);
+    }
+    if (this.gui != null) {
+      this.gui.setModel(model);
+    }
   }
 
   @Override
   public ViewModel getViewModel() {
-    return gui.getViewModel();
+    if (this.gui != null) {
+      return gui.getViewModel();
+    }
+    else {
+      return midi.getViewModel();
+    }
   }
 
   /**
@@ -191,11 +222,6 @@ public class CompositeView extends Application implements GuiView {
     classMouseListener = listener;
   }
 
-  @Override
-  public void addMouseMotionListener(MouseMotionListener listener) {
-    this.mouseMotionListener = listener;
-    classMouseMotionListener = listener;
-  }
 
   @Override
   public Timeline play() {
@@ -213,6 +239,7 @@ public class CompositeView extends Application implements GuiView {
               }
             })
     );
+    // run the timeline indefinitely unless explicitly stopped
     timeline.setCycleCount(Animation.INDEFINITE);
     timeline.play();
     this.timeline = timeline;

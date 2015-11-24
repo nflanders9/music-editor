@@ -1,6 +1,5 @@
 package cs3500.music.view;
 
-import java.awt.*;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -51,7 +50,14 @@ public class MainGUI implements GuiView {
    */
   private MouseMotionListener mouseMotionListener;
 
+  /**
+   * Represents the highest Playable to render in this GUI view
+   */
   private Playable highBound;
+
+  /**
+   * Represents the lowest Playable to render in this GUI view
+   */
   private Playable lowBound;
 
   /**
@@ -59,9 +65,24 @@ public class MainGUI implements GuiView {
    */
   private double timestamp;
 
+  /**
+   * Represents the Canvas to draw this GUI view onto
+   */
   private final Canvas canvas;
+
+  /**
+   * Represents the GraphicsContext used for rendering onto the Canvas of this GuiView
+   */
   private GraphicsContext gc;
+
+  /**
+   * Maps the instrument ID numbers to the gradient colors used to render them in this GuiView
+   */
   private final Map<Integer, LinearGradient> colors;
+
+  /**
+   * Represents the Timeline object used to control the animation of this GuiView
+   */
   private Timeline timeline;
 
   /**
@@ -120,12 +141,6 @@ public class MainGUI implements GuiView {
   public void addMouseListener(MouseListener listener) {
     Objects.requireNonNull(listener);
     this.mouseListener = listener;
-  }
-
-  @Override
-  public void addMouseMotionListener(MouseMotionListener listener) {
-    Objects.requireNonNull(listener);
-    this.mouseMotionListener = listener;
   }
 
   @Override

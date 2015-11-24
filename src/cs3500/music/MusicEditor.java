@@ -22,6 +22,9 @@ public final class MusicEditor {
       filename = args[0];
       mode = args[1];
     }
+    else if (args.length == 1) {
+      filename = args[0];
+    }
 
     try {
       MusicEditorModel song = MusicReader.parseFile(new FileReader(filename), Song.builder());
@@ -32,12 +35,6 @@ public final class MusicEditor {
       else {
         view.render(0);
       }
-//      try {
-//
-//        Thread.sleep(song.getLength() * (60000000 / song.getTempo()));
-//      } catch (InterruptedException e) {
-//
-//      }
     }
     catch (FileNotFoundException e) {
       System.err.println("Unable to open " + filename);

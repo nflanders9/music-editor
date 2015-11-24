@@ -238,12 +238,12 @@ public class GUIController implements Controller {
 
       @Override
       public void mousePressed(MouseEvent e) {
-        view.getViewModel().setDragOrigin(e.getPoint());
+
       }
 
       @Override
       public void mouseReleased(MouseEvent e) {
-        view.getViewModel().setDragOrigin(null);
+
       }
 
       @Override

@@ -128,9 +128,6 @@ public class MidiView implements View {
     catch (InvalidMidiDataException e){
 
     }
-
-    //this.receiver.close();
-
   }
 
   public void playAll() {
