@@ -6,6 +6,7 @@ import java.awt.event.MouseMotionListener;
 
 import cs3500.music.model.Playable;
 import javafx.animation.Timeline;
+import javafx.scene.canvas.Canvas;
 
 /**
  * Represents a graphical view of a MusicEditorModel
@@ -72,4 +73,10 @@ public interface GuiView extends View {
    * @throws NullPointerException if the given Playable is null
    */
   void setLowBound(Playable note);
+
+  /**
+   * Return the canvas associated with this GUI view
+   * @return
+   */
+  Canvas getCanvas();
 }

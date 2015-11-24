@@ -163,30 +163,32 @@ public class MainGUI implements GuiView {
    * @return  a new Playable at the click location
    */
   private Playable getNewClickedNote(int x, int y) {
+    // account for bezels around grid where there are no notes
     y -= GUIConstants.GRID_PADDING_TOP;
     x -= GUIConstants.GRID_PADDING_LEFT;
-    Playable highest = model.getHighest();
-    Playable lowest = model.getLowest();
-    int beatNum = (x / (GUIConstants.MEASURE_WIDTH / model.getBeatsPerMeasure()));
+
+    Playable highest = getHighBound();
+
+    // find the beat that is located at the clicked location
+    double leftmostBeat = Math.max((model.getTempo() * model.getCurrentTime() / 60.0)
+            - GUIConstants.MAX_BAR_LOCATION * model.getBeatsPerMeasure(), 0);
+
+    int beatNum = x / (GUIConstants.MEASURE_WIDTH / model.getBeatsPerMeasure());
+    double beat = beatNum + leftmostBeat;
+
     int pitchNum = y / GUIConstants.GRID_SPACING_VERT;
 
+    // finds the pitch that is located at the clicked location
     Pitch pitch = Pitch.pitchFromMidi(
             Pitch.getMidi(highest.getPitch(), highest.getOctave()) - pitchNum);
+
+    // finds the octave that is located at the clicked location
     int octave = Pitch.octaveFromMidi(
             Pitch.getMidi(highest.getPitch(), highest.getOctave()) - pitchNum);
 
-    double beat = Math.round(model.getTempo() * model.getCurrentTime() / 60.0);
-    if (beat > GUIConstants.MAX_BAR_LOCATION * model.getBeatsPerMeasure()) {
-      beatNum = (int) ((Math.floor((model.getCurrentTime() * 60) / model.getTempo()) + (int) beat
-              + beatNum - (model.getBeatsPerMeasure() * GUIConstants.MAX_BAR_LOCATION)));
-      System.out.print("BEAT NUM: ");
-      System.out.println(beatNum);
-    }
-    else {
-      beatNum = (int) ((model.getCurrentTime() * 60) / model.getTempo()) + beatNum;
-    }
 
-    return new Note(beatNum, 1, pitch, octave);
+
+    return new Note((int) Math.round(beat), 1, pitch, octave);
   }
 
   /**
@@ -200,16 +202,16 @@ public class MainGUI implements GuiView {
     y -= GUIConstants.GRID_PADDING_TOP;
     x -= GUIConstants.GRID_PADDING_LEFT;
 
-    Playable highest = model.getHighest();
-    Playable lowest = model.getLowest();
+    Playable highest = getHighBound();
+    double leftmostBeat = Math.max((model.getTempo() * model.getCurrentTime() / 60.0)
+            - GUIConstants.MAX_BAR_LOCATION * model.getBeatsPerMeasure(), 0);
+
 
     int beatNum = x / (GUIConstants.MEASURE_WIDTH / model.getBeatsPerMeasure());
     int pitchNum = y / GUIConstants.GRID_SPACING_VERT;
 
+
     // finds the pitch that is located at the clicked location
-    //Playable highestInModel = model.getHighest();
-    //pitchNum -= Pitch.distance(lowest.getPitch(), lowest.getOctave(),
-    //        highestInModel.getPitch(), highestInModel.getOctave());
     Pitch pitch = Pitch.pitchFromMidi(
             Pitch.getMidi(highest.getPitch(), highest.getOctave()) - pitchNum);
 
@@ -218,17 +220,10 @@ public class MainGUI implements GuiView {
             Pitch.getMidi(highest.getPitch(), highest.getOctave()) - pitchNum);
 
     // find the beat that is located at the clicked location
-    double beat = Math.round(model.getTempo() * model.getCurrentTime() / 60.0);
-    if (beat > GUIConstants.MAX_BAR_LOCATION * model.getBeatsPerMeasure()) {
-      beatNum = (int) (((model.getCurrentTime() * 60) / model.getTempo()) + (int) beat
-              + beatNum - (model.getBeatsPerMeasure() * GUIConstants.MAX_BAR_LOCATION));
-      System.out.print("BEAT NUM: ");
-      System.out.println(beatNum);
-    }
-    else {
-      beatNum = (int) ((model.getCurrentTime() * 60) / model.getTempo()) + beatNum;
-    }
-    for (Playable note : model.getNotes(beatNum)) {
+    double exactBeat = beatNum + leftmostBeat;
+    int beat = (int) Math.round(exactBeat);
+
+    for (Playable note : model.getNotes(beat)) {
       if (note.getPitch() == pitch && note.getOctave() == octave) {
         return note;
       }
@@ -314,7 +309,7 @@ public class MainGUI implements GuiView {
                     GUIConstants.GRID_PADDING_LEFT);
 
 
-    // find the highest and lowest notes in this Song
+    // find the highest and lowest notes in this view
     Playable lowest = getLowBound();
     Playable highest = getHighBound();
 
@@ -471,10 +466,7 @@ public class MainGUI implements GuiView {
 
   }
 
-  /**
-   * Get the canvas for this view
-   * @return  the Canvas for this view
-   */
+  @Override
   public Canvas getCanvas() {
     return this.canvas;
   }

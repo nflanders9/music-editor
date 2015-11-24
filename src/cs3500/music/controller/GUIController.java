@@ -238,7 +238,6 @@ public class GUIController implements Controller {
 
       @Override
       public void mousePressed(MouseEvent e) {
-        System.out.println("PRESSED");
         view.getViewModel().setDragOrigin(e.getPoint());
       }
 
@@ -262,7 +261,6 @@ public class GUIController implements Controller {
 
   @Override
   public void handleKey(KeyEvent event) {
-    System.out.println(event.getKeyCode());
     if (event.getID() == KeyEvent.KEY_PRESSED) {
       keyHandler.keyPressed(event);
     }

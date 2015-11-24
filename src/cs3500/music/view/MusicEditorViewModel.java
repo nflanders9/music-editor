@@ -62,7 +62,7 @@ public class MusicEditorViewModel implements ViewModel {
     this.selected = new ArrayList<Playable>();
     this.currentTime = 0;
     this.newNoteDuration = 2;
-    this.newNoteInstrumentID = 0;
+    this.newNoteInstrumentID = 1;
     this.dragOrigin = null;
   }
 

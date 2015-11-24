@@ -27,12 +27,13 @@ public interface Controller {
 
   /**
    * Creates a new KeyListener with callback actions associated with it
-   * @return
+   * @return a KeyListener object for views to use for callbacks
    */
   KeyListener createKeyListener();
 
   /**
    * Creates a new MouseListener with actions associated with it
+   * @return a MouseListener object for views to use for callbacks
    */
   MouseListener createMouseListener();
 

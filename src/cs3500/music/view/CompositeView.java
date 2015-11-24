@@ -41,22 +41,22 @@ public class CompositeView extends Application implements GuiView {
   /**
    * Represents the GUI view contained in this class
    */
-  private static MainGUI classGui;
+  private static GuiView classGui;
 
   /**
    * Represents the MIDI view contained in this class
    */
-  private static MidiView classMidi;
+  private static View classMidi;
 
   /**
    * Represents the GUI view contained in this composite view
    */
-  private MainGUI gui;
+  private GuiView gui;
 
   /**
    * Represents the MIDI view contained in this composite view
    */
-  private MidiView midi;
+  private View midi;
 
 
   private KeyListener keyListener;
@@ -138,7 +138,6 @@ public class CompositeView extends Application implements GuiView {
       public void handle(KeyEvent event) {
         if (keyListener != null) {
           if (event.getEventType() == KeyEvent.KEY_PRESSED) {
-            System.out.println(new KeyEventAdapter(event).getKeyCode());
             keyListener.keyPressed(new KeyEventAdapter(event));
           } else if (event.getEventType() == KeyEvent.KEY_RELEASED) {
             keyListener.keyReleased(new KeyEventAdapter(event));
@@ -248,5 +247,10 @@ public class CompositeView extends Application implements GuiView {
   @Override
   public void setLowBound(Playable note) {
     gui.setLowBound(note);
+  }
+
+  @Override
+  public Canvas getCanvas() {
+    return gui.getCanvas();
   }
 }
