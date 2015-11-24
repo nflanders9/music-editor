@@ -206,6 +206,30 @@ public final class Song implements MusicEditorModel {
     return this.getExtremePlayable(false);
   }
 
+  @Override
+  public Playable moveNote(Playable note, int steps) {
+    int startBeat = note.getStartBeat();
+    if (startBeat + steps < 0) {
+      throw new IllegalArgumentException("invalid number of steps");
+    }
+
+    int duration = note.getDuration();
+
+    boolean found = false;
+    for (int i = startBeat; i < startBeat + duration; i ++) {
+      found |= this.notes.get(i).remove(note);
+    }
+    if (!found) {
+      throw new IllegalArgumentException("note does not exist in the music editor model");
+    }
+    note.setStart(note.getStartBeat() + steps);
+    for (int i = startBeat + steps; i < startBeat + steps + duration; i ++ ) {
+      ensureInit(i);
+      this.notes.get(i).add(note);
+    }
+    return note;
+  }
+
   /**
    * Returns the Playable that is the highest in the song if highest is true or the lowest
    * in the song otherwise

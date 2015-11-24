@@ -4,7 +4,6 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,7 +12,6 @@ import cs3500.music.model.Playable;
 import cs3500.music.view.GuiView;
 import cs3500.music.view.ViewModel;
 import javafx.animation.Timeline;
-import jdk.nashorn.internal.runtime.regexp.joni.ApplyCaseFoldArg;
 
 
 /**
@@ -180,6 +178,53 @@ public class GUIController implements Controller {
       view.render(view.getViewModel().getCurrentTime());
     });
 
+    // handle w key for transposing selection upwards
+    kh.installKeyPressed(58, () -> {
+      ViewModel vm = view.getViewModel();
+      for (Playable note : vm.getSelected()) {
+        int newMidi = Pitch.getMidi(note.getPitch(), note.getOctave()) + 1;
+        note.setPitch(Pitch.pitchFromMidi(newMidi));
+        note.setOctave(Pitch.octaveFromMidi(newMidi));
+      }
+      view.render(vm.getCurrentTime());
+    });
+
+    // handle s key for transposing selection downward
+    kh.installKeyPressed(54, () -> {
+      ViewModel vm = view.getViewModel();
+      for (Playable note : vm.getSelected()) {
+        int newMidi = Pitch.getMidi(note.getPitch(), note.getOctave()) - 1;
+        note.setPitch(Pitch.pitchFromMidi(newMidi));
+        note.setOctave(Pitch.octaveFromMidi(newMidi));
+      }
+      view.render(vm.getCurrentTime());
+    });
+
+    // handle a key for moving selection left
+    kh.installKeyPressed(36, () -> {
+      ViewModel vm = view.getViewModel();
+
+      // need to iterate through a copy because selected is modified by vm.moveNote()
+      List<Playable> tempList = new ArrayList<Playable>(vm.getSelected());
+      for (Playable note : tempList) {
+        if (note.getStartBeat() > 0) {
+          vm.moveNote(note, -1);
+        }
+      }
+      view.render(vm.getCurrentTime());
+    });
+
+    // handle d key for moving selection right
+    kh.installKeyPressed(39, () -> {
+      ViewModel vm = view.getViewModel();
+      // need to iterate through a copy because selected is modified by vm.moveNote()
+      List<Playable> tempList = new ArrayList<Playable>(vm.getSelected());
+      for (Playable note : tempList) {
+        vm.moveNote(note, 1);
+      }
+      view.render(vm.getCurrentTime());
+    });
+
     return kh;
   }
 
@@ -213,22 +258,6 @@ public class GUIController implements Controller {
       }
     };
     return mouseListener;
-  }
-
-  @Override
-  public MouseMotionListener createMouseMotionListener() {
-    MouseMotionListener mouseMotionListener = new MouseMotionListener() {
-      @Override
-      public void mouseDragged(MouseEvent e) {
-        view.mouseDrag(e.getX(), e.getY());
-      }
-
-      @Override
-      public void mouseMoved(MouseEvent e) {
-
-      }
-    };
-    return mouseMotionListener;
   }
 
   @Override

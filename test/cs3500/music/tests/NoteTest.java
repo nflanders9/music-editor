@@ -277,6 +277,7 @@ public class NoteTest {
     assertEquals(Pitch.octaveFromMidi(60), 4);
     assertEquals(Pitch.octaveFromMidi(59), 3);
     assertEquals(Pitch.octaveFromMidi(49), 3);
+    assertEquals(Pitch.octaveFromMidi(71), 4);
     assertEquals(Pitch.pitchFromMidi(60), Pitch.C);
     assertEquals(Pitch.pitchFromMidi(61), Pitch.Cs);
     assertEquals(Pitch.pitchFromMidi(59), Pitch.B);

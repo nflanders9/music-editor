@@ -257,37 +257,6 @@ public class MainGUI implements GuiView {
     render(model.getCurrentTime());
   }
 
-  @Override
-  public void mouseDrag(int x, int y) {
-    System.out.println("DRAG");
-    Playable foundNote = getClicked(x, y);
-    if (foundNote != null) {
-      model.select(foundNote);
-    }
-    int pitchDelta = 0;
-    int beatDelta = 0;
-    if (model.getDragOrigin() != null) {
-      beatDelta = (int) (x - model.getDragOrigin().getX()) /
-              (GUIConstants.MEASURE_WIDTH / model.getBeatsPerMeasure());
-      pitchDelta = (int) ((y - model.getDragOrigin().getY()) / GUIConstants.GRID_SPACING_VERT);
-
-      System.out.print("BEAT DELTA: ");
-      System.out.println(beatDelta);
-      System.out.print("PITCH DELTA: ");
-      System.out.println(pitchDelta);
-      for (Playable note : model.getSelected()) {
-        note.setStart(Math.max(note.getStartBeat() + beatDelta, 0));
-        note.setPitch(Pitch.pitchFromMidi(Pitch.getMidi(note.getPitch(), note.getOctave())
-                - pitchDelta));
-      }
-    }
-    if (pitchDelta > 0 || beatDelta > 0) {
-      model.setDragOrigin(new Point(x, y));
-      System.out.println("Dragged");
-    }
-
-    render(model.getCurrentTime());
-  }
 
   @Override
   public Playable getHighBound() {

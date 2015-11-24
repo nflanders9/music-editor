@@ -133,7 +133,6 @@ public class CompositeView extends Application implements GuiView {
     // sets the key listener for the JavaFX application to use Swing KeyEvents
     this.keyListener = classKeyListener;
     this.mouseListener = classMouseListener;
-    this.mouseMotionListener = classMouseMotionListener;
     scene.setOnKeyPressed(new EventHandler<KeyEvent>() {
       @Override
       public void handle(KeyEvent event) {
@@ -169,17 +168,6 @@ public class CompositeView extends Application implements GuiView {
           mouseListener.mousePressed(
                   new java.awt.event.MouseEvent(new Box(0), 0, 0, 0, (int) event.getX(),
                           (int) event.getY(), 0, false, event.getButton().ordinal()));
-        }
-      }
-    });
-
-    scene.setOnMouseDragged(new EventHandler<MouseEvent>() {
-      @Override
-      public void handle(MouseEvent event) {
-        if (event != null) {
-          mouseMotionListener.mouseDragged(
-                  new java.awt.event.MouseEvent(new Box(0), 0, 0, 0, (int)event.getX(),
-                          (int)event.getY(), 0, false, event.getButton().ordinal()));
         }
       }
     });
@@ -240,11 +228,6 @@ public class CompositeView extends Application implements GuiView {
   @Override
   public void mouseClick(int x, int y, boolean leftButton) {
     gui.mouseClick(x, y, leftButton);
-  }
-
-  @Override
-  public void mouseDrag(int x, int y) {
-    gui.mouseDrag(x, y);
   }
 
   @Override

@@ -191,4 +191,12 @@ public class MusicEditorViewModel implements ViewModel {
   public Playable getLowest() {
     return model.getLowest();
   }
+
+  @Override
+  public Playable moveNote(Playable note, int steps) {
+    this.selected.remove(note);
+    Playable newNote = model.moveNote(note, steps);
+    this.selected.add(newNote);
+    return newNote;
+  }
 }

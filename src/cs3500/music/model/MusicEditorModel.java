@@ -93,4 +93,14 @@ public interface MusicEditorModel {
    */
   public Playable getLowest();
 
+  /**
+   * Shifts the given note in this MusicEditorModel by the given number of beats
+   * @param note  the Playable to shift
+   * @param steps the number of steps to shift the Playable by
+   * @throws IllegalArgumentException if the given Playable is not in this MusicEditorModel
+   * or the requested shift puts the note at a negative beat
+   * @return  the note that has been shifted
+   */
+  public Playable moveNote(Playable note, int steps);
+
 }

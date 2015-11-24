@@ -36,5 +36,4 @@ public interface Controller {
    */
   MouseListener createMouseListener();
 
-  MouseMotionListener createMouseMotionListener();
 }

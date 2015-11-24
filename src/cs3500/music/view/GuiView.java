@@ -48,13 +48,6 @@ public interface GuiView extends View {
   void mouseClick(int x, int y, boolean leftButton);
 
   /**
-   * Handles a mouse drag event where the mouse is being dragged at the given x and y coordinates
-   * @param x the x coordinate of the mouse being dragged
-   * @param y the y coordinate of the mouse being dragged
-   */
-  void mouseDrag(int x, int y);
-
-  /**
    * Get the highest Playable to render in this GUI view
    * @return  the highest Playable to render in this GUI view
    */
