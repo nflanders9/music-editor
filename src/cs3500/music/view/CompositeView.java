@@ -154,22 +154,21 @@ public class CompositeView extends Application implements GuiView {
       @Override
       public void handle(MouseEvent event) {
         if (mouseListener != null) {
-          if (event.getEventType() == MouseEvent.MOUSE_CLICKED) {
-            mouseListener.mouseClicked(
-                    new java.awt.event.MouseEvent(new Box(0), 0, 0, 0, (int)event.getX(),
-                            (int)event.getY(), 0, false, event.getButton().ordinal()));
-          }
-          else if (event.getEventType() == MouseEvent.MOUSE_PRESSED) {
-            System.out.println("PRESSED");
-            mouseListener.mousePressed(
-                    new java.awt.event.MouseEvent(new Box(0), 0, 0, 0, (int) event.getX(),
-                            (int) event.getY(), 0, false, event.getButton().ordinal()));
-          }
-          else if (event.getEventType() == MouseEvent.MOUSE_RELEASED) {
-            mouseListener.mouseReleased(
-                    new java.awt.event.MouseEvent(new Box(0), 0, 0, 0, (int)event.getX(),
-                            (int)event.getY(), 0, false, event.getButton().ordinal()));
-          }
+          mouseListener.mouseClicked(
+                  new java.awt.event.MouseEvent(new Box(0), 0, 0, 0, (int)event.getX(),
+                          (int)event.getY(), 0, false, event.getButton().ordinal()));
+
+        }
+      }
+    });
+
+    scene.setOnMousePressed(new EventHandler<MouseEvent>() {
+      @Override
+      public void handle(MouseEvent event) {
+        if (mouseListener != null) {
+          mouseListener.mousePressed(
+                  new java.awt.event.MouseEvent(new Box(0), 0, 0, 0, (int) event.getX(),
+                          (int) event.getY(), 0, false, event.getButton().ordinal()));
         }
       }
     });

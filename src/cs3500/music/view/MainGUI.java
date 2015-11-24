@@ -196,18 +196,28 @@ public class MainGUI implements GuiView {
    * @return  the Playable that was clicked or null if no Playable was clicked
    */
   private Playable getClicked(int x, int y) {
+    // account for bezels around grid where there are no notes
     y -= GUIConstants.GRID_PADDING_TOP;
     x -= GUIConstants.GRID_PADDING_LEFT;
+
     Playable highest = model.getHighest();
     Playable lowest = model.getLowest();
+
     int beatNum = x / (GUIConstants.MEASURE_WIDTH / model.getBeatsPerMeasure());
     int pitchNum = y / GUIConstants.GRID_SPACING_VERT;
 
+    // finds the pitch that is located at the clicked location
+    //Playable highestInModel = model.getHighest();
+    //pitchNum -= Pitch.distance(lowest.getPitch(), lowest.getOctave(),
+    //        highestInModel.getPitch(), highestInModel.getOctave());
     Pitch pitch = Pitch.pitchFromMidi(
             Pitch.getMidi(highest.getPitch(), highest.getOctave()) - pitchNum);
+
+    // finds the octave that is located at the clicked location
     int octave = Pitch.octaveFromMidi(
             Pitch.getMidi(highest.getPitch(), highest.getOctave()) - pitchNum);
 
+    // find the beat that is located at the clicked location
     double beat = Math.round(model.getTempo() * model.getCurrentTime() / 60.0);
     if (beat > GUIConstants.MAX_BAR_LOCATION * model.getBeatsPerMeasure()) {
       beatNum = (int) (((model.getCurrentTime() * 60) / model.getTempo()) + (int) beat
@@ -249,6 +259,7 @@ public class MainGUI implements GuiView {
 
   @Override
   public void mouseDrag(int x, int y) {
+    System.out.println("DRAG");
     Playable foundNote = getClicked(x, y);
     if (foundNote != null) {
       model.select(foundNote);
@@ -267,7 +278,7 @@ public class MainGUI implements GuiView {
       for (Playable note : model.getSelected()) {
         note.setStart(Math.max(note.getStartBeat() + beatDelta, 0));
         note.setPitch(Pitch.pitchFromMidi(Pitch.getMidi(note.getPitch(), note.getOctave())
-                + pitchDelta));
+                - pitchDelta));
       }
     }
     if (pitchDelta > 0 || beatDelta > 0) {

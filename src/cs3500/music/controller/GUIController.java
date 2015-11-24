@@ -109,13 +109,16 @@ public class GUIController implements Controller {
       int newLowMidi = Pitch.getMidi(currentLow.getPitch(), currentLow.getOctave()) - 1;
       int newHighMidi = Pitch.getMidi(currentHigh.getPitch(), currentHigh.getOctave()) - 1;
 
-      // mutate the highest and lowest Playables to modify the view window
-      view.setLowBound(currentLow.setPitch(Pitch.pitchFromMidi(newLowMidi)).setOctave(
-              Pitch.octaveFromMidi(newLowMidi)));
-      view.setHighBound(currentHigh.setPitch(Pitch.pitchFromMidi(newHighMidi)).setOctave(
-              Pitch.octaveFromMidi(newHighMidi)));
+      // don't allow for negative MIDI values because those break things
+      if (newLowMidi >= 0) {
+        // mutate the highest and lowest Playables to modify the view window
+        view.setLowBound(currentLow.setPitch(Pitch.pitchFromMidi(newLowMidi)).setOctave(
+                Pitch.octaveFromMidi(newLowMidi)));
+        view.setHighBound(currentHigh.setPitch(Pitch.pitchFromMidi(newHighMidi)).setOctave(
+                Pitch.octaveFromMidi(newHighMidi)));
 
-      view.render(view.getViewModel().getCurrentTime());
+        view.render(view.getViewModel().getCurrentTime());
+      }
     });
 
     // handle home key
@@ -190,6 +193,7 @@ public class GUIController implements Controller {
 
       @Override
       public void mousePressed(MouseEvent e) {
+        System.out.println("PRESSED");
         view.getViewModel().setDragOrigin(e.getPoint());
       }
 
