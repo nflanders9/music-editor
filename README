@@ -1,4 +1,4 @@
-Music Editor Design Modification Decisions
+Music Editor Design
 Nicholas Flanders
 Perry Dai
 
@@ -6,23 +6,17 @@ Perry Dai
 
 Changes:
 
-Before implementing the views for our music editor, we decided to make some modifications
-to the design of our model. First, we decided to make a Playable interface that our Note
-class would implement instead of directly exposing the concrete Note class. This allowed us
-to hide the detail of how notes were implemented specifically. Additionally, we needed to
-add the ability to get and set volume and instrument IDs to our Playable interface as we
-realized that this data would be important for rendering a MIDI view.
+As we began to implement a controller for the GUI view, we decided to add a ViewModel interface
+as we realized that we needed to keep track of a state that was separate from our model of the
+composition. The GUI views now contain a reference to a ViewModel instead of a MusicEditorModel
+and the ViewModel extends MusicEditorModel. The ViewModel contains methods that track the current
+time that is being rendered by the View as well as methods to get configuration information for
+adding new notes and for getting and setting the set of currently selected notes.
 
-Another significant change that we made to our model was to switch from a List<Note> in our
-composition representation to a Map<Integer, List<Playable>> where the keys of this map
-correspond to a beat number in the song and the list contains references to all of the notes
-either sustaining or beginning during that beat. It can be easily determined by a view
-whether a note is beginning or sustaining by simply comparing the start beat that is stored in
-the note itself to the beat number that was used to retrieve the list that the beat was found
-in. Additionally, we added methods on our MusicEditorModel interface to return references to the
-lowest and highest notes found in a song. We originally thought that this information should be
-determined by the views if necessary, but we decided to put it in the model since this data
-is required by many types of models that are designed to visualize data.
+Additionally, we refactored our render method on the View interface to take a timestamp to
+render the ViewModel at. We also re-implemented our getLength() functionality to be more efficient
+as certain calls from the views and the controller were causing the old implementation to be a
+performance bottleneck.
 
 
 
@@ -35,22 +29,46 @@ track all of the data necessary to render them, including their pitch, octave, s
 duration, instrument ID, and volume. Pitches are represented by an Enum which also contains
 several convenience methods for converting to and from MIDI values.
 
+The ViewModel interface extends the MusicEditorModel interface and provides methods to track
+additional state information that is needed by the views for rendering that is not tracked by
+the MusicEditorModel interface.
+
 The views for our music editor all implement the View interface, which allows a client to render
 a model with the given view and to change the model associated with that view. The ConsoleView
 class implements View in order to return a vertical ASCII representation of the model contained
 within that view. The MainGUI class is a view that uses JavaFX to render a graphical view of a
-model. Because JavaFX applications are always created by calling a default constructor that takes
-no arguments, there is a static field on that class with a reference to a model that will be
-rendered and this model is then assigned to a non-static field for each instance of that class.
-The class GUIConstants is a wrapper class containing configuration constants for this JavaFX UI.
-Finally, the MidiView class implements the View interface in such a way that the model contained
-within it is rendered audibly through MIDI. All of these views can be constructed through the
-ViewFactory class which contains a method that returns various types of views based on a String
-argument passed to it.
+model. The CompositeView class is a view that extends the JavaFX application class and coordinates
+the synchronized rendering of a graphical view and a MIDI view. The MainGUI view and the
+CompositeView both implement a GuiView interface which extends the View interface and adds
+additional functionality needed for rendering graphical representations of the ViewModels.
+
+The Controller interface has two methods which simply return listeners for mouse and keyboard
+events. The GUIController class is the concrete implementation of this class and the event
+handlers that it returns contain Runnables which take actions on the views when they are called
+as a callback by the views. The KeyboardHandler class implements the KeyListener interface and
+it is responsible for associating a key event code with the appropriate Runnable to call. Because
+the KeyListener interface uses Swing KeyEvents and not JavaFX KeyEvents, the KeyEventAdapter class
+subclasses Swing KeyEvents and adapts a JavaFX KeyEvent to be compatible with the Swing interfaces.
 
 
 
-*************************************************
-NEWLY ADDED FOR ASSIGNMENT 7:
+Controls:
 
- - refactor render method on View interface to take a timestamp to render at
+  Mouse Controls:
+
+- Click on an empty space to add a note
+- Click on a note to add it to the selection set
+- Right click on any non-note space to clear the current selection
+- Right click on any note to delete that note
+
+ Keyboard Controls:
+
+- Play/pause the composition with the space bar
+- Scroll through the composition with the left and right keys
+- Scroll through the visible pitches with the up and down keys
+- Delete all currently selected notes with the delete key
+- Shift/Transpose all currently selected notes using WASD
+- Increment the instrument number to use for new notes with the Page Up and Page Down keys
+- Select the number of beats to use for new notes with the number keys 1 through 9
+- Jump to the beginning of the composition using the Home key
+- Jump to the end of the composition using the End key
