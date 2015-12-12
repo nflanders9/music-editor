@@ -62,4 +62,15 @@ public interface ViewModel extends MusicEditorModel {
    */
   void setNewNoteInstrument(int id);
 
+  /**
+   * Return the current iteration number for the current time of the ViewModel
+   */
+  int getIteration();
+
+  /**
+   * Sets the current iteration number for the current time of the ViewModel
+   * @param iterationNum  the iteration number to set this ViewModel to
+   */
+  void setIteration(int iterationNum);
+
 }

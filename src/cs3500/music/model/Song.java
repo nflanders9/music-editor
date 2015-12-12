@@ -2,6 +2,7 @@ package cs3500.music.model;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.Objects;
 import java.util.TreeMap;
 
@@ -28,18 +29,26 @@ public final class Song implements MusicEditorModel {
   private int beatsPerMeasure;
 
   /**
+   * Represents the Links found in this song as a map where the keys are beat numbers and the
+   * values are lists of Links found at that beat
+   */
+  private Map<Integer, List<Link>> links;
+
+  /**
    * Construct an empty Song with a default tempo of 120 bpm
    */
   public Song() {
     this.notes = new TreeMap<Integer, List<Playable>>();
     this.tempo = 120;
     this.beatsPerMeasure = 4;
+    this.links = new TreeMap<Integer, List<Link>>();
   }
 
   private Song(TreeMap<Integer, List<Playable>> notes, int tempo, int beatsPerMeasure) {
     this.notes = (TreeMap<Integer, List<Playable>>) notes.clone();
     this.tempo = tempo;
     this.beatsPerMeasure = beatsPerMeasure;
+    this.links = new TreeMap<Integer, List<Link>>();
   }
 
   /**
@@ -57,6 +66,9 @@ public final class Song implements MusicEditorModel {
     }
     this.tempo = tempo;
     this.beatsPerMeasure = beatsPerMeasure;
+    this.links = new TreeMap<Integer, List<Link>>();
+    this.links.put(this.getLength(), new ArrayList<Link>());
+    this.links.get(this.getLength()).add(new LinkImpl(0, 0));
   }
 
   @Override
@@ -228,6 +240,16 @@ public final class Song implements MusicEditorModel {
       this.notes.get(i).add(note);
     }
     return note;
+  }
+
+  @Override
+  public List<Link> getLinks(int beat) {
+    if (this.links.containsKey(beat)) {
+      return this.links.get(beat);
+    }
+    else {
+      return new ArrayList<Link>();
+    }
   }
 
   /**

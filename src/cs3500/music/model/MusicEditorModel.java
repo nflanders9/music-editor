@@ -103,4 +103,11 @@ public interface MusicEditorModel {
    */
   public Playable moveNote(Playable note, int steps);
 
+  /**
+   * Return a list of all the Links associated with the given beat
+   * @param beat  the beat at which to retrieve the Links
+   * @return      the list containing all Links at the given beat
+   */
+  public List<Link> getLinks(int beat);
+
 }

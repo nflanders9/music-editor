@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import cs3500.music.model.Link;
 import cs3500.music.model.MusicEditorModel;
 import cs3500.music.model.Note;
 import cs3500.music.model.Pitch;
@@ -297,6 +298,15 @@ public class MainGUI implements GuiView {
    * @throws NullPointerException if gc is null
    */
   private void render(GraphicsContext gc, double seconds, Map<Integer, LinearGradient> colors) {
+    int beatNum = (int) Math.ceil((timestamp / 60.0) * model.getTempo());
+    for (Link link : model.getLinks(beatNum)) {
+      if (link.getPlayIteration() == model.getIteration()) {
+        model.setCurrentTime(link.getLinkedBeat() * 60.0 / model.getTempo());
+        model.setIteration(model.getIteration() + 1);
+        seconds = link.getLinkedBeat() * 60.0 / model.getTempo();
+      }
+    }
+
     gc.setFill(Color.LIGHTGREY);
     gc.fillRect(0, 0, GUIConstants.WINDOW_WIDTH, GUIConstants.WINDOW_HEIGHT);
 

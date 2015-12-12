@@ -12,6 +12,7 @@ import javax.sound.midi.Receiver;
 import javax.sound.midi.ShortMessage;
 import javax.sound.midi.Synthesizer;
 
+import cs3500.music.model.Link;
 import cs3500.music.model.MusicEditorModel;
 import cs3500.music.model.Pitch;
 import cs3500.music.model.Playable;
@@ -119,7 +120,14 @@ public class MidiView implements View {
   public void render(double timestamp) {
     Objects.requireNonNull(this.model);
     try {
-      int beatNum = (int) Math.ceil((timestamp / 60.0) * model.getTempo());
+      int beatNum = (int) Math.round(((timestamp - 0.05) / 60.0) * model.getTempo());
+      for (Link link : model.getLinks(beatNum)) {
+        if (link.getPlayIteration() == model.getIteration()) {
+          model.setCurrentTime(link.getLinkedBeat() * 60.0 / model.getTempo());
+          model.setIteration(model.getIteration() + 1);
+          return;
+        }
+      }
       if (beatNum != this.lastBeat) {
         this.playNotes(beatNum);
         this.lastBeat = beatNum;

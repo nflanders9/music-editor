@@ -7,6 +7,7 @@ import java.util.Objects;
 import javax.swing.*;
 
 import cs3500.music.controller.KeyEventAdapter;
+import cs3500.music.model.Link;
 import cs3500.music.model.MusicEditorModel;
 import cs3500.music.model.Playable;
 import javafx.animation.Animation;
@@ -232,9 +233,17 @@ public class CompositeView extends Application implements GuiView {
               @Override
               public void handle(ActionEvent event) {
                 if (getViewModel().isPlaying()) {
-                  render(time);
                   getViewModel().setCurrentTime(time);
-                  time += .005;
+                  int beatNum = (int) ((time / 60.0) * getViewModel().getTempo());
+                  for (Link link : getViewModel().getLinks(beatNum)) {
+                    if (link.getPlayIteration() == getViewModel().getIteration()) {
+                      getViewModel().setCurrentTime(
+                              link.getLinkedBeat() * 60.0 / getViewModel().getTempo() - 0.005);
+                      getViewModel().setIteration(getViewModel().getIteration() + 1);
+                    }
+                  }
+                  render(getViewModel().getCurrentTime());
+                  time = getViewModel().getCurrentTime() + 0.005;
                 }
               }
             })

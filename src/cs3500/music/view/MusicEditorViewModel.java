@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import cs3500.music.model.Link;
 import cs3500.music.model.MusicEditorModel;
 import cs3500.music.model.Playable;
 
@@ -46,6 +47,11 @@ public class MusicEditorViewModel implements ViewModel {
   private int newNoteInstrumentID;
 
   /**
+   * Represents the iteration number associated with the current time of this model
+   */
+  private int iteration;
+
+  /**
    * Constructs a new MusicEditorViewModel based on the given MusicEditorModel
    * @param model the MusicEditorModel to adapt to the ViewModel interface
    * @throws NullPointerException if the given MusicEditorModel is null
@@ -58,6 +64,7 @@ public class MusicEditorViewModel implements ViewModel {
     this.currentTime = 0;
     this.newNoteDuration = 2;
     this.newNoteInstrumentID = 1;
+    this.iteration = 0;
   }
 
   @Override
@@ -109,6 +116,16 @@ public class MusicEditorViewModel implements ViewModel {
   @Override
   public void setNewNoteInstrument(int id) {
     this.newNoteInstrumentID = id;
+  }
+
+  @Override
+  public int getIteration() {
+    return this.iteration;
+  }
+
+  @Override
+  public void setIteration(int iterationNum) {
+    this.iteration = iterationNum;
   }
 
   @Override
@@ -182,5 +199,10 @@ public class MusicEditorViewModel implements ViewModel {
     Playable newNote = model.moveNote(note, steps);
     this.selected.add(newNote);
     return newNote;
+  }
+
+  @Override
+  public List<Link> getLinks(int beat) {
+    return model.getLinks(beat);
   }
 }
