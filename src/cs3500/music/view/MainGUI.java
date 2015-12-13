@@ -514,7 +514,10 @@ public class MainGUI implements GuiView {
             Integer.toString(model.getNewNoteInstrument()), 80, 12);
     gc.fillText("Selected note duration: " +
             Integer.toString(model.getNewNoteDuration()), 260, 12);
-
+    if (model.getLinkStart() != null) {
+      gc.fillText("Link Source Beat: " +
+              Integer.toString(model.getLinkStart()), 440, 12);
+    }
   }
 
   @Override

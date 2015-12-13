@@ -260,6 +260,25 @@ public final class Song implements MusicEditorModel {
     }
   }
 
+  @Override
+  public void addLink(Link link) {
+    if (this.links.containsKey(link.getLocationBeat())) {
+      this.links.get(link.getLocationBeat()).add(link);
+    }
+    else {
+      this.links.put(link.getLocationBeat(), new ArrayList<Link>());
+      this.links.get(link.getLocationBeat()).add(link);
+    }
+  }
+
+  @Override
+  public boolean removeLink(Link link) {
+    if (!this.links.containsKey(link.getLocationBeat())) {
+      return false;
+    }
+    return this.links.get(link.getLocationBeat()).remove(link);
+  }
+
   /**
    * Returns the Playable that is the highest in the song if highest is true or the lowest
    * in the song otherwise

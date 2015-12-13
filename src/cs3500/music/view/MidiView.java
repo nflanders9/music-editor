@@ -120,7 +120,7 @@ public class MidiView implements View {
   public void render(double timestamp) {
     Objects.requireNonNull(this.model);
     try {
-      int beatNum = (int) Math.round(((timestamp - 0.05) / 60.0) * model.getTempo());
+      int beatNum = (int) Math.round((timestamp / 60.0) * model.getTempo());
       for (Link link : model.getLinks(beatNum)) {
         if (link.getPlayIteration() == model.getIteration()) {
           model.setCurrentTime(link.getLinkedBeat() * 60.0 / model.getTempo());

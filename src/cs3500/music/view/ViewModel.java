@@ -1,5 +1,7 @@
 package cs3500.music.view;
 
+import com.sun.istack.internal.Nullable;
+
 import java.lang.reflect.Array;
 import java.util.List;
 
@@ -85,5 +87,18 @@ public interface ViewModel extends MusicEditorModel {
    * Resets the iteration number to the lowest possible value for the current beat
    */
   void resetIteration();
+
+  /**
+   * Get the current link start state in this ViewModel
+   * @return  the current link start beat in this ViewModel
+   */
+  @Nullable
+  Integer getLinkStart();
+
+  /**
+   * Sets the current beat that a Link will start from in this ViewModel
+   * @param beat  the beat that a Link will start from in this ViewModel - can be null
+   */
+  void setLinkStart(Integer beat);
 
 }

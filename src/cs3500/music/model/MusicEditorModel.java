@@ -110,4 +110,18 @@ public interface MusicEditorModel {
    */
   public List<Link> getLinks(int beat);
 
+  /**
+   * Adds the given Link to this ViewModel
+   * @param link  the Link to be added to this ViewModel
+   */
+  void addLink(Link link);
+
+  /**
+   * Remove any Links equal to the given Link from this ViewModel
+   * @param link  the link to remove
+   * @return  true if the Link was found and remove, false otherwise
+   */
+  boolean removeLink(Link link);
+
+
 }

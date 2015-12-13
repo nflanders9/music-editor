@@ -120,7 +120,7 @@ public class CompositeView extends Application implements GuiView {
     if (this.gui != null) {
       this.gui.render(timestamp);
     }
-    if (this.midi != null) {
+    if (this.midi != null && getViewModel().isPlaying()) {
       this.midi.render(timestamp);
     }
   }
@@ -233,7 +233,8 @@ public class CompositeView extends Application implements GuiView {
               @Override
               public void handle(ActionEvent event) {
                 if (getViewModel().isPlaying()) {
-                  getViewModel().setCurrentTime(time);
+                  getViewModel().setCurrentTime(Math.max(0, time));
+                  System.out.println(getViewModel().getCurrentTime());
                   int beatNum = (int) Math.round(((time / 60.0) * getViewModel().getTempo()));
                   for (Link link : getViewModel().getLinks(beatNum)) {
                     if (link.getPlayIteration() == getViewModel().getIteration()) {

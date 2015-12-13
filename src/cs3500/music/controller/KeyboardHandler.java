@@ -87,6 +87,7 @@ public class KeyboardHandler implements KeyListener {
    */
   public void keyPressed(KeyEvent e) {
     Objects.requireNonNull(e);
+    System.out.println(e.getKeyCode()); // TODO remove this when finished debugging
     if (keyPressed.containsKey(e.getKeyCode())) {
       keyPressed.get(e.getKeyCode()).run();
     }

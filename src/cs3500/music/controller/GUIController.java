@@ -7,6 +7,7 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import cs3500.music.model.LinkImpl;
 import cs3500.music.model.Pitch;
 import cs3500.music.model.Playable;
 import cs3500.music.view.GuiView;
@@ -49,7 +50,7 @@ public class GUIController implements Controller {
 
   @Override
   public KeyListener createKeyListener() {
-    double HORIZONTAL_SCROLL_SCALE = 0.06;
+    double HORIZONTAL_SCROLL_SCALE = 0.12;
     KeyboardHandler kh = new KeyboardHandler();
 
     // handle space bar
@@ -225,6 +226,20 @@ public class GUIController implements Controller {
       List<Playable> tempList = new ArrayList<Playable>(vm.getSelected());
       for (Playable note : tempList) {
         vm.moveNote(note, 1);
+      }
+      view.render(vm.getCurrentTime());
+    });
+
+    // handle l key for creating links
+    kh.installKeyPressed(47, () -> {
+      ViewModel vm = view.getViewModel();
+      int curBeat = (int) Math.round(((vm.getCurrentTime() / 60.0) * vm.getTempo()));
+      if (vm.getLinkStart() != null) {
+        vm.addLink(new LinkImpl(vm.getLinkStart(),curBeat, vm.getIteration()));
+        vm.setLinkStart(null);
+      }
+      else {
+        vm.setLinkStart(curBeat);
       }
       view.render(vm.getCurrentTime());
     });

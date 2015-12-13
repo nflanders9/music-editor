@@ -59,6 +59,11 @@ public class MusicEditorViewModel implements ViewModel {
   private List<Link> sortedLinkList;
 
   /**
+   * Represents the beat number that new Links will start from in this ViewModel
+   */
+  private Integer linkStart;
+
+  /**
    * Constructs a new MusicEditorViewModel based on the given MusicEditorModel
    * @param model the MusicEditorModel to adapt to the ViewModel interface
    * @throws NullPointerException if the given MusicEditorModel is null
@@ -76,12 +81,8 @@ public class MusicEditorViewModel implements ViewModel {
     for (int beat = 0; beat < model.getLength(); beat++) {
       this.sortedLinkList.addAll(getLinks(beat));
     }
-    Collections.sort(this.sortedLinkList, new Comparator<Link>() {
-      @Override
-      public int compare(Link o1, Link o2) {
-        return o1.getPlayIteration() - o2.getPlayIteration();
-      }
-    });
+    sortLinkList();
+    this.linkStart = null;
   }
 
   @Override
@@ -165,6 +166,16 @@ public class MusicEditorViewModel implements ViewModel {
   }
 
   @Override
+  public Integer getLinkStart() {
+    return linkStart;
+  }
+
+  @Override
+  public void setLinkStart(Integer beat) {
+    this.linkStart = beat;
+  }
+
+  @Override
   public void addNote(Playable note) {
     model.addNote(note);
   }
@@ -240,5 +251,26 @@ public class MusicEditorViewModel implements ViewModel {
   @Override
   public List<Link> getLinks(int beat) {
     return model.getLinks(beat);
+  }
+
+  @Override
+  public void addLink(Link link) {
+    model.addLink(link);
+    this.sortedLinkList.add(link);
+    sortLinkList();
+  }
+
+  @Override
+  public boolean removeLink(Link link) {
+    return false;
+  }
+
+  private void sortLinkList() {
+    Collections.sort(this.sortedLinkList, new Comparator<Link>() {
+      @Override
+      public int compare(Link o1, Link o2) {
+        return o1.getPlayIteration() - o2.getPlayIteration();
+      }
+    });
   }
 }
