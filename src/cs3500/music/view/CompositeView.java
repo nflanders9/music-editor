@@ -234,7 +234,7 @@ public class CompositeView extends Application implements GuiView {
               public void handle(ActionEvent event) {
                 if (getViewModel().isPlaying()) {
                   getViewModel().setCurrentTime(time);
-                  int beatNum = (int) ((time / 60.0) * getViewModel().getTempo());
+                  int beatNum = (int) Math.round(((time / 60.0) * getViewModel().getTempo()));
                   for (Link link : getViewModel().getLinks(beatNum)) {
                     if (link.getPlayIteration() == getViewModel().getIteration()) {
                       getViewModel().setCurrentTime(

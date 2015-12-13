@@ -3,6 +3,8 @@ package cs3500.music.view;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -52,6 +54,11 @@ public class MusicEditorViewModel implements ViewModel {
   private int iteration;
 
   /**
+   * Represent the list of Links contained within this ViewModel sorted by the play iteration
+   */
+  private List<Link> sortedLinkList;
+
+  /**
    * Constructs a new MusicEditorViewModel based on the given MusicEditorModel
    * @param model the MusicEditorModel to adapt to the ViewModel interface
    * @throws NullPointerException if the given MusicEditorModel is null
@@ -65,6 +72,16 @@ public class MusicEditorViewModel implements ViewModel {
     this.newNoteDuration = 2;
     this.newNoteInstrumentID = 1;
     this.iteration = 0;
+    this.sortedLinkList = new ArrayList<Link>();
+    for (int beat = 0; beat < model.getLength(); beat++) {
+      this.sortedLinkList.addAll(getLinks(beat));
+    }
+    Collections.sort(this.sortedLinkList, new Comparator<Link>() {
+      @Override
+      public int compare(Link o1, Link o2) {
+        return o1.getPlayIteration() - o2.getPlayIteration();
+      }
+    });
   }
 
   @Override
@@ -126,6 +143,25 @@ public class MusicEditorViewModel implements ViewModel {
   @Override
   public void setIteration(int iterationNum) {
     this.iteration = iterationNum;
+  }
+
+  @Override
+  public List<Link> getAllLinks() {
+    return this.sortedLinkList;
+  }
+
+  @Override
+  public void resetIteration() {
+    int curBeat = (int) Math.round(((currentTime / 60.0) * getTempo()));
+    for (Link link : sortedLinkList) {
+      if (link.getLocationBeat() >= curBeat) {
+        setIteration(link.getPlayIteration());
+        return;
+      }
+      else if (sortedLinkList.indexOf(link) == sortedLinkList.size() - 1) {
+        setIteration(link.getPlayIteration() + 1);
+      }
+    }
   }
 
   @Override

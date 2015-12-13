@@ -71,7 +71,7 @@ public class GUIController implements Controller {
       if (!view.getViewModel().isPlaying()) {
         view.getViewModel().setCurrentTime(Math.max(0,
                 view.getViewModel().getCurrentTime() - HORIZONTAL_SCROLL_SCALE));
-        view.getViewModel().setIteration(0);
+        view.getViewModel().resetIteration();
         view.render(view.getViewModel().getCurrentTime());
       }
     });
@@ -81,7 +81,7 @@ public class GUIController implements Controller {
       if (!view.getViewModel().isPlaying()) {
         view.getViewModel().setCurrentTime(
                 view.getViewModel().getCurrentTime() + HORIZONTAL_SCROLL_SCALE);
-        view.getViewModel().setIteration(0);
+        view.getViewModel().resetIteration();
         view.render(view.getViewModel().getCurrentTime());
       }
     });

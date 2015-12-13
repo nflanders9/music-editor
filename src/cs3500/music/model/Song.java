@@ -56,7 +56,8 @@ public final class Song implements MusicEditorModel {
    * @param notes the list containing the Notes to be added to this Song
    * @throws IllegalArgumentException if the tempo or beatsPerMeasure are not positive
    */
-  public Song(List<Playable> notes, int tempo, int beatsPerMeasure) {
+  public Song(List<Playable> notes, int tempo,
+              int beatsPerMeasure, Map<Integer, List<Link>> links) {
     if (tempo <= 0 || beatsPerMeasure <= 0) {
       throw new IllegalArgumentException("Invalid song construction arguments");
     }
@@ -66,9 +67,16 @@ public final class Song implements MusicEditorModel {
     }
     this.tempo = tempo;
     this.beatsPerMeasure = beatsPerMeasure;
-    this.links = new TreeMap<Integer, List<Link>>();
-    this.links.put(this.getLength(), new ArrayList<Link>());
-    this.links.get(this.getLength()).add(new LinkImpl(0, 0));
+    this.links = links;
+  }
+
+  /**
+   * Construct a Song based on the notes in the given List of Playables
+   * @param notes the list containing the Notes to be added to this Song
+   * @throws IllegalArgumentException if the tempo or beatsPerMeasure are not positive
+   */
+  public Song(List<Playable> notes, int tempo, int beatsPerMeasure) {
+    this(notes, tempo, beatsPerMeasure, new TreeMap<Integer, List<Link>>());
   }
 
   @Override
@@ -292,6 +300,12 @@ public final class Song implements MusicEditorModel {
     private List<Playable> notes;
 
     /**
+     * Represents the lists of Links to include in this song at the given corresponding
+     * beat numbers
+     */
+    private Map<Integer, List<Link>> links;
+
+    /**
      * Represents the tempo of this song in beats per minute
      */
     private int tempo;
@@ -308,6 +322,7 @@ public final class Song implements MusicEditorModel {
       this.notes = new ArrayList<Playable>();
       this.tempo = 120;
       this.beatsPerMeasure = 4;
+      this.links = new TreeMap<Integer, List<Link>>();
     }
 
     /**
@@ -317,7 +332,7 @@ public final class Song implements MusicEditorModel {
      */
     @Override
     public MusicEditorModel build() {
-      return new Song(this.notes, this.tempo, this.beatsPerMeasure);
+      return new Song(this.notes, this.tempo, this.beatsPerMeasure, this.links);
     }
 
     /**
@@ -348,6 +363,26 @@ public final class Song implements MusicEditorModel {
                                                         int pitch, int volume) {
       this.notes.add(new Note(start, end - start, Pitch.pitchFromMidi(pitch),
               Pitch.octaveFromMidi(pitch), instrument, volume));
+      return this;
+    }
+
+    /**
+     * Adds a new link to the piece
+     *
+     * @param beatLocation the beat where the link originates from
+     * @param linkedBeat   the beat that the link points to
+     * @param iterationNum the iteration number that the link is active for
+     * @return this builder
+     */
+    @Override
+    public CompositionBuilder<MusicEditorModel> addLink(int beatLocation, int linkedBeat, int iterationNum) {
+      if (this.links.containsKey(beatLocation)) {
+        this.links.get(beatLocation).add(new LinkImpl(beatLocation, linkedBeat, iterationNum));
+      }
+      else {
+        this.links.put(beatLocation, new ArrayList<Link>());
+        this.links.get(beatLocation).add(new LinkImpl(beatLocation, linkedBeat, iterationNum));
+      }
       return this;
     }
   }

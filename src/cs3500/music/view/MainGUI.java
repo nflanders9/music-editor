@@ -3,6 +3,8 @@ package cs3500.music.view;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +27,7 @@ import javafx.scene.paint.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.*;
 import javafx.util.Duration;
+import javafx.util.Pair;
 
 /**
  * Represents a javafxUI for displaying a {@link cs3500.music.model.MusicEditorModel} graphically
@@ -298,6 +301,17 @@ public class MainGUI implements GuiView {
    * @throws NullPointerException if gc is null
    */
   private void render(GraphicsContext gc, double seconds, Map<Integer, LinearGradient> colors) {
+
+    List<Pair<Integer, Integer>> linkDurations = new ArrayList<Pair<Integer, Integer>>();
+    int lastStartBeat = 0;
+    // determine all of the link paths to draw
+    for (Link link : model.getAllLinks()) {
+      linkDurations.add(new Pair(lastStartBeat, link.getLocationBeat()));
+      lastStartBeat = link.getLinkedBeat();
+    }
+    linkDurations.add(new Pair<>(lastStartBeat, Integer.MAX_VALUE));
+
+
     int beatNum = (int) Math.ceil((timestamp / 60.0) * model.getTempo());
     for (Link link : model.getLinks(beatNum)) {
       if (link.getPlayIteration() == model.getIteration()) {
@@ -415,6 +429,13 @@ public class MainGUI implements GuiView {
          curBeat < (int) beat + model.getBeatsPerMeasure() * GUIConstants.MAX_MEASURES_ON_SCREEN;
          curBeat++) {
       List<Playable> notes = model.getNotes(curBeat);
+      // calculate the position and width to use to draw the note
+      double start = (curBeat - minBeat) *
+              GUIConstants.MEASURE_WIDTH / model.getBeatsPerMeasure()
+              + GUIConstants.GRID_PADDING_LEFT;
+      double displayStart = Math.max(start, GUIConstants.GRID_PADDING_LEFT);
+      double displayWidth = (GUIConstants.MEASURE_WIDTH /model.getBeatsPerMeasure()) -
+              (displayStart - start);
 
       // draw every note at the given beat
 
@@ -438,21 +459,27 @@ public class MainGUI implements GuiView {
         int pitchNum = Pitch.distance(lowestPitch, lowestOctave,
                 note.getPitch(), note.getOctave());
 
-        // calculate the position and width to use to draw the note
-        double start = (curBeat - minBeat) *
-                GUIConstants.MEASURE_WIDTH / model.getBeatsPerMeasure()
-                + GUIConstants.GRID_PADDING_LEFT;
-
-        double displayStart = Math.max(start, GUIConstants.GRID_PADDING_LEFT);
-        double displayWidth = (GUIConstants.MEASURE_WIDTH /model.getBeatsPerMeasure()) -
-                (displayStart - start);
 
         gc.fillRect(displayStart, GUIConstants.GRID_PADDING_TOP +
                         GUIConstants.GRID_SPACING_VERT * (width - pitchNum - 1),
                 displayWidth,
                 GUIConstants.GRID_SPACING_VERT);
       }
+      // draw the link paths
+      double height = GUIConstants.GRID_PADDING_TOP + (1 + getHighBound().compareTo(getLowBound()))
+              * GUIConstants.GRID_SPACING_VERT;
+      for (Pair<Integer, Integer> interval : linkDurations) {
+        if (curBeat < interval.getValue() && curBeat >= interval.getKey()) {
+          gc.setFill(GUIConstants.INACTIVE_TRACK_COLOR);
+          int index = linkDurations.indexOf(interval);
+          if (index == model.getIteration()) {
+            gc.setFill(GUIConstants.ACTIVE_TRACK_COLOR);
+          }
+          gc.fillRect(displayStart - 1, height + index * 22, displayWidth + 2, 20);
+        }
+      }
     }
+
 
 
     // draw vertical measure lines

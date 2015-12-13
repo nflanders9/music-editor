@@ -30,6 +30,24 @@ final class GUIConstants {
   static final double MAX_BAR_LOCATION = 3;
 
   static final Color SELECT_COLOR = Color.LIGHTSEAGREEN;
+  static final LinearGradient ACTIVE_TRACK_COLOR =
+          new LinearGradient(0,
+                  GUIConstants.GRID_PADDING_TOP,
+                  0,
+                  GUIConstants.GRID_PADDING_TOP + (GUIConstants.GRID_SPACING_VERT / 2),
+                  false,
+                  CycleMethod.REFLECT,
+                  new Stop(0, Color.rgb(51, 153, 255)),
+                  new Stop(1, Color.rgb(91, 193, 255)));
+  static final LinearGradient INACTIVE_TRACK_COLOR =
+          new LinearGradient(0,
+                  GUIConstants.GRID_PADDING_TOP,
+                  0,
+                  GUIConstants.GRID_PADDING_TOP + (GUIConstants.GRID_SPACING_VERT / 2),
+                  false,
+                  CycleMethod.REFLECT,
+                  new Stop(0, Color.rgb(175, 175, 175)),
+                  new Stop(1, Color.rgb(200, 200, 200)));
 
   static final LinearGradient NOTE_START_COLOR =
           new LinearGradient(0, GUIConstants.GRID_PADDING_TOP,

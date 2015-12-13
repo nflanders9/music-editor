@@ -1,7 +1,9 @@
 package cs3500.music.view;
 
+import java.lang.reflect.Array;
 import java.util.List;
 
+import cs3500.music.model.Link;
 import cs3500.music.model.MusicEditorModel;
 import cs3500.music.model.Playable;
 
@@ -72,5 +74,16 @@ public interface ViewModel extends MusicEditorModel {
    * @param iterationNum  the iteration number to set this ViewModel to
    */
   void setIteration(int iterationNum);
+
+  /**
+   * Return a list of all Links in this view model
+   * @return  a List of all Links in this ViewModel
+   */
+  List<Link> getAllLinks();
+
+  /**
+   * Resets the iteration number to the lowest possible value for the current beat
+   */
+  void resetIteration();
 
 }

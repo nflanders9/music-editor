@@ -32,4 +32,13 @@ public interface CompositionBuilder<T> {
    * @return
    */
   CompositionBuilder<T> addNote(int start, int end, int instrument, int pitch, int volume);
+
+  /**
+   * Adds a new link to the piece
+   * @param beatLocation  the beat where the link originates from
+   * @param linkedBeat    the beat that the link points to
+   * @param iterationNum  the iteration number that the link is active for
+   * @return              this builder
+   */
+  CompositionBuilder<T> addLink(int beatLocation, int linkedBeat, int iterationNum);
 }

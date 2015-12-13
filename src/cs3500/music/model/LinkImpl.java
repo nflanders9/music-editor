@@ -15,11 +15,17 @@ public class LinkImpl implements Link {
   private int linkedBeatNum;
 
   /**
+   * Represents the beat number that this LinkImpl is located at
+   */
+  private int locationBeat;
+
+  /**
    * Constructs a new LinkImpl with the given beat to link to and the given active iteration
    * @param linkedBeatNum the beat to link to when active
    * @param iterNum       the iteration number to make the link active during
    */
-  public LinkImpl(int linkedBeatNum, int iterNum) {
+  public LinkImpl(int locationBeat, int linkedBeatNum, int iterNum) {
+    this.locationBeat = locationBeat;
     this.iterNum = iterNum;
     this.linkedBeatNum = linkedBeatNum;
   }
@@ -33,5 +39,10 @@ public class LinkImpl implements Link {
   @Override
   public int getLinkedBeat() {
     return this.linkedBeatNum;
+  }
+
+  @Override
+  public int getLocationBeat() {
+    return this.locationBeat;
   }
 }

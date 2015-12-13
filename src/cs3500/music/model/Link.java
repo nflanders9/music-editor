@@ -17,4 +17,10 @@ public interface Link {
    * @return  the beat number that this link leads to
    */
   int getLinkedBeat();
+
+  /**
+   * Returns the beat number that this link is located at
+   * @return the beat number that this link is located at
+   */
+  int getLocationBeat();
 }
