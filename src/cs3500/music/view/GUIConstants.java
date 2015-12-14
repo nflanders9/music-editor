@@ -15,7 +15,7 @@ final class GUIConstants {
   private GUIConstants() { } // prevents instantiation
 
   static final int WINDOW_HEIGHT = 1000;
-  static final int WINDOW_WIDTH = 800;
+  static final int WINDOW_WIDTH = 1200;
   static final int GRID_SPACING_VERT = 20;
   static final int GRID_PADDING_LEFT = 40;
   static final int GRID_PADDING_TOP = 40;

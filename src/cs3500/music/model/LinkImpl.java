@@ -25,6 +25,9 @@ public class LinkImpl implements Link {
    * @param iterNum       the iteration number to make the link active during
    */
   public LinkImpl(int locationBeat, int linkedBeatNum, int iterNum) {
+    if (iterNum < 0) {
+      throw new IllegalArgumentException("negative iteration number");
+    }
     this.locationBeat = locationBeat;
     this.iterNum = iterNum;
     this.linkedBeatNum = linkedBeatNum;
@@ -34,6 +37,16 @@ public class LinkImpl implements Link {
   @Override
   public int getPlayIteration() {
     return this.iterNum;
+  }
+
+  @Override
+  public void setPlayIteration(int iteration) {
+    if (iteration < 0) {
+      throw new IllegalArgumentException("negative iteration number");
+    }
+    else {
+      this.iterNum = iteration;
+    }
   }
 
   @Override

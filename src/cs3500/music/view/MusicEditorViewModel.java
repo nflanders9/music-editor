@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Objects;
 
 import cs3500.music.model.Link;
+import cs3500.music.model.LinkImpl;
 import cs3500.music.model.MusicEditorModel;
 import cs3500.music.model.Playable;
 
@@ -255,6 +256,9 @@ public class MusicEditorViewModel implements ViewModel {
 
   @Override
   public void addLink(Link link) {
+    for (Link oldLink : sortedLinkList) {
+      oldLink.setPlayIteration(oldLink.getPlayIteration() + 1);
+    }
     model.addLink(link);
     this.sortedLinkList.add(link);
     sortLinkList();
@@ -262,9 +266,13 @@ public class MusicEditorViewModel implements ViewModel {
 
   @Override
   public boolean removeLink(Link link) {
-    return false;
+    this.sortedLinkList.remove(link);
+    return model.removeLink(link);
   }
 
+  /**
+   * Sort this ViewModel's sortedLinkList by the play iteration
+   */
   private void sortLinkList() {
     Collections.sort(this.sortedLinkList, new Comparator<Link>() {
       @Override

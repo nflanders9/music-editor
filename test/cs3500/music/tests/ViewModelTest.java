@@ -2,6 +2,8 @@ package cs3500.music.tests;
 
 import org.junit.Test;
 
+import cs3500.music.model.Link;
+import cs3500.music.model.LinkImpl;
 import cs3500.music.model.MusicEditorModel;
 import cs3500.music.model.Note;
 import cs3500.music.model.Pitch;
@@ -83,6 +85,40 @@ public class ViewModelTest {
     vm1.setNewNoteDuration(6);
     assertEquals(vm1.getNewNoteInstrument(), 123);
     assertEquals(vm1.getNewNoteDuration(), 6);
+  }
+
+  @Test
+  public void testLinkStart() {
+    init();
+    assertNull(vm1.getLinkStart());
+    vm1.setLinkStart(6);
+    assertEquals(vm1.getLinkStart(), new Integer(6));
+    vm1.setLinkStart(null);
+    assertNull(vm1.getLinkStart());
+  }
+
+  @Test
+  public void testIteration() {
+    init();
+    assertEquals(vm1.getIteration(), 0);
+    vm1.setIteration(4);
+    assertEquals(vm1.getIteration(), 4);
+    vm1.resetIteration();
+    assertEquals(vm1.getIteration(), 0);
+  }
+
+  @Test
+  public void testLinks() {
+    init();
+    Link l2 = new LinkImpl(4, 0, 1);
+    Link l3 = new LinkImpl(0, 0, 3);
+    Link l1 = new LinkImpl(8, 0, 0);
+    vm1.addLink(l2);
+    vm1.addLink(l1);
+    vm1.addLink(l3);
+    assertEquals(vm1.getAllLinks().size(), 3);
+    // ensure that the links are being properly sorted by their iteration number
+    assertEquals(vm1.getAllLinks().get(0), l1);
   }
 
 }

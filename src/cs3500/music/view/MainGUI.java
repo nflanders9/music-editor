@@ -511,12 +511,12 @@ public class MainGUI implements GuiView {
 
     // draw label for the current editor configuration
     gc.fillText("Instrument being edited: " +
-            Integer.toString(model.getNewNoteInstrument()), 80, 12);
+            Integer.toString(model.getNewNoteInstrument()), 120, 12);
     gc.fillText("Selected note duration: " +
-            Integer.toString(model.getNewNoteDuration()), 260, 12);
+            Integer.toString(model.getNewNoteDuration()), 360, 12);
     if (model.getLinkStart() != null) {
       gc.fillText("Link Source Beat: " +
-              Integer.toString(model.getLinkStart()), 440, 12);
+              Integer.toString(model.getLinkStart()), 600, 12);
     }
   }
 

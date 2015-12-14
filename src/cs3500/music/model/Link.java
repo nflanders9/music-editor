@@ -13,6 +13,12 @@ public interface Link {
   int getPlayIteration();
 
   /**
+   * Sets the active iteration of this Link to the given value
+   * @param iteration   the new iteration number at which to activate this link
+   */
+  void setPlayIteration(int iteration);
+
+  /**
    * Returns the beat number that this link leads to
    * @return  the beat number that this link leads to
    */

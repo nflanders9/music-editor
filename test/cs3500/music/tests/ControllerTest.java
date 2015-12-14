@@ -112,12 +112,12 @@ public class ControllerTest {
     keyListener.keyPressed(right);
     keyListener.keyPressed(right);
     keyListener.keyPressed(right);
-    assertEquals(composite.getViewModel().getCurrentTime(), 0.18, 0.001);
+    assertEquals(composite.getViewModel().getCurrentTime(), 0.36, 0.001);
 
     // scroll to the left 2 times
     keyListener.keyPressed(left);
     keyListener.keyPressed(left);
-    assertEquals(composite.getViewModel().getCurrentTime(), 0.06, 0.001);
+    assertEquals(composite.getViewModel().getCurrentTime(), 0.12, 0.001);
   }
 
   @Test
@@ -321,8 +321,30 @@ public class ControllerTest {
     // delete the note that was added by right clicking on it
     composite.mouseClick(100, 100, false);
     assertEquals(composite.getViewModel().getNotes(4).size(), 0);
+  }
 
 
+  @Test
+  public void testUpdatingLinks() {
+    init();
+
+    KeyEvent link = new KeyEvent(new Box(0), 0, 0, 0, 47, ' ');
+
+    assertEquals(composite.getViewModel().getAllLinks().size(), 0);
+    assertNull(composite.getViewModel().getLinkStart());
+
+    // press the "L" key
+    keyListener.keyPressed(link);
+
+    assertEquals(composite.getViewModel().getAllLinks().size(), 0);
+    assertEquals(composite.getViewModel().getLinkStart(), new Integer(0));
+
+    composite.getViewModel().setCurrentTime(1000);
+    // press the "L" key
+    keyListener.keyPressed(link);
+
+    assertEquals(composite.getViewModel().getAllLinks().size(), 1);
+    assertNull(composite.getViewModel().getLinkStart());
 
   }
 

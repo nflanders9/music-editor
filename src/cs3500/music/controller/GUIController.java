@@ -7,6 +7,7 @@ import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import cs3500.music.model.Link;
 import cs3500.music.model.LinkImpl;
 import cs3500.music.model.Pitch;
 import cs3500.music.model.Playable;
@@ -235,7 +236,7 @@ public class GUIController implements Controller {
       ViewModel vm = view.getViewModel();
       int curBeat = (int) Math.round(((vm.getCurrentTime() / 60.0) * vm.getTempo()));
       if (vm.getLinkStart() != null) {
-        vm.addLink(new LinkImpl(vm.getLinkStart(),curBeat, vm.getIteration()));
+        vm.addLink(new LinkImpl(vm.getLinkStart(),curBeat, 0));
         vm.setLinkStart(null);
       }
       else {
@@ -243,6 +244,18 @@ public class GUIController implements Controller {
       }
       view.render(vm.getCurrentTime());
     });
+
+    // handle c key for clearing all links
+    kh.installKeyPressed(38, () -> {
+      ViewModel vm = view.getViewModel();
+      List<Link> temp = new ArrayList<Link>();
+      temp.addAll(vm.getAllLinks());
+      for (Link link : temp) {
+        vm.removeLink(link);
+      }
+      view.render(vm.getCurrentTime());
+    });
+
 
     return kh;
   }
